@@ -84,7 +84,7 @@ private:  // yes yes it is by default
     int  m_Socket;
     int  connfd;
     
-    int m_efd;
+static    int m_efd;
     int m_MaxEvents;
     
     int   m_iTimeOut;
@@ -101,7 +101,7 @@ static    void *writetask(void *args);
     // epoll descriptor from epoll_create()
     int m_epfd;                            
     // register epoll_ctl()
-    struct epoll_event ev;               
+static    struct epoll_event ev;               
     // store queued events from epoll_wait()
 //    struct epoll_event events[m_MaxEvents];
      struct epoll_event* events;
@@ -115,19 +115,23 @@ static    void *writetask(void *args);
     pthread_t  *pRThread;  // == tid1 or tid2
     pthread_t  *pWThread;  // == tid1 or tid2
     
-    pthread_mutex_t *r_mutex;             
-    pthread_cond_t  *r_condl;
+static    pthread_mutex_t *r_mutex;             
+static    pthread_cond_t  *r_condl;
 
-    pthread_mutex_t *w_mutex;             
-    pthread_cond_t  *w_condl;
+static    pthread_mutex_t *w_mutex;             
+static    pthread_cond_t  *w_condl;
 
-    struct task *readhead = NULL, *readtail = NULL;
-    struct task *writehead = NULL, *writetail = NULL;
+static    struct task *readhead, *readtail;
+static    struct task *writehead, *writetail;
     
     EPOLL_CTOR_LIST m_CtorList;
     
     int m_iError;
     void setnonblocking(int sock);
+    
+    int m_iReadMutexIndex;
+    int m_iWriteMutexIndex;
+
     
 public:    
     int  PrepListener();
@@ -136,6 +140,19 @@ public:
     int ProcessEpoll();
     
 };
+
+pthread_mutex_t *CEpoll::r_mutex;             
+pthread_cond_t  *CEpoll::r_condl;
+
+pthread_mutex_t *CEpoll::w_mutex;             
+pthread_cond_t  *CEpoll::w_condl;
+
+struct task *CEpoll::readhead = NULL, *CEpoll::readtail = NULL;
+struct task *CEpoll::writehead = NULL, *CEpoll::writetail = NULL;
+
+int CEpoll::m_efd;
+struct epoll_event CEpoll::ev ;               
+
 //********************************************************************************************//
 CEpoll::CEpoll(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
 {
@@ -158,30 +175,45 @@ CEpoll::CEpoll(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
    events = new epoll_event[m_MaxEvents ];
    
    m_iServerPort = m_CtorList.iServerPort;
-
    
    
-  for (int ii = 0; ii < CtorList.iMaxReadThreads; ii++) {
+  for (int ii = 0; ii < m_CtorList.iMaxReadThreads; ii++) {
     pthread_mutex_init(&r_mutex[i], NULL);
     pthread_cond_init(&r_condl[i], NULL);
     
-    pthread_create(&pRThread[ii], NULL, readtask, NULL);    
+    pthread_create(&pRThread[ii], NULL, readtask, &ii);    
   }    
 
-  for (int ii = 0; ii < CtorList.iMaxWriteThreads; ii++) {
+  for (int ii = 0; ii < m_CtorList.iMaxWriteThreads; ii++) {
     pthread_mutex_init(&w_mutex[i], NULL);
     pthread_cond_init(&w_condl[i], NULL);
     
-    pthread_create(&pWThread[ii], NULL, writetask, NULL);    
+    pthread_create(&pWThread[ii], NULL, writetask, &ii);    
   }    
+  
+      
+   m_iReadMutexIndex 	= 0;
+   m_iWriteMutexIndex  	= 0;
+
 
 }
 //********************************************************************************************//
 CEpoll::~CEpoll()
 {
-
+// Terminate all threads
+  
    close(m_efd);  // Amro added this one...author did not close the file descriptor
    delete[] events;
+   
+   delete [] pRThread  ;
+   delete []  pWThread ;
+   
+   delete []  r_mutex ;             
+   delete []  r_condl ;
+
+   delete []  w_mutex ;       
+   delete []  w_condl ;
+   
       
 }
 //********************************************************************************************//
@@ -330,12 +362,14 @@ int CEpoll::ProcessEpoll()
                 if (events[i].data.fd < 0)
                     continue;
                 printf("[SERVER] put task %d to read queue\n", events[i].data.fd);
-                new_task = (task*) malloc(sizeof(struct task));
+//                new_task = (task*) malloc(sizeof(struct task));
+	        new_task = new task;
+		
                 new_task->data.fd = events[i].data.fd;
                 new_task->next = NULL;
                 //printf("[SERVER] thread %d epollin before lock\n", pthread_self());
                 // protect task queue (readhead/readtail)
-                pthread_mutex_lock(&r_mutex);      
+                pthread_mutex_lock(&r_mutex[m_iReadMutexIndex]);      
                 //printf("[SERVER] thread %d epollin after lock\n", pthread_self());
                 // the queue is empty
                 if (readhead == NULL)
@@ -350,9 +384,11 @@ int CEpoll::ProcessEpoll()
                     readtail = new_task;
                 }
                 // trigger readtask thread
-                pthread_cond_broadcast(&r_condl);  
+//                pthread_cond_broadcast(&r_condl);
+                pthread_cond_broadcast(&r_condl[m_iReadMutexIndex]);  
                 //printf("[SERVER] thread %d epollin before unlock\n", pthread_self());
-                pthread_mutex_unlock(&r_mutex);
+//                pthread_mutex_unlock(&r_mutex);
+                pthread_mutex_unlock(&r_mutex[m_iReadMutexIndex]);		
                 //printf("[SERVER] thread %d epollin after unlock\n", pthread_self());
             }
             // Have data to send
@@ -360,12 +396,18 @@ int CEpoll::ProcessEpoll()
             {
                 if (events[i].data.ptr == NULL)
                     continue;
+		
+		if (m_iWriteMutexIndex++ > m_CtorList.iMaxWriteThreads)
+		  m_iWriteMutexIndex = 0;
+		
+		
                 printf("[SERVER] put task %d to write queue\n", ((struct task*)events[i].data.ptr)->data.fd);
-                new_task = (task*)malloc(sizeof(struct task));
+                new_task = new task;
                 new_task->data.ptr = (struct user_data*)events[i].data.ptr;
                 new_task->next = NULL;
                 //printf("[SERVER] thread %d epollout before lock\n", pthread_self());
-                pthread_mutex_lock(&w_mutex);
+//                pthread_mutex_lock(&w_mutex);
+                pthread_mutex_lock(&w_mutex[m_iWriteMutexIndex]);		
                 //printf("[SERVER] thread %d epollout after lock\n", pthread_self());
                 // the queue is empty
                 if (writehead == NULL)
@@ -380,9 +422,10 @@ int CEpoll::ProcessEpoll()
                     writetail = new_task;
                 }
                 // trigger writetask thread
-                pthread_cond_broadcast(&w_condl);  
+//                pthread_cond_broadcast(&w_condl);
+                pthread_cond_broadcast(&w_condl[m_iWriteMutexIndex]);  		
                 //printf("[SERVER] thread %d epollout before unlock\n", pthread_self());
-                pthread_mutex_unlock(&w_mutex);
+                pthread_mutex_unlock(&w_mutex[m_iWriteMutexIndex]);
                 //printf("[SERVER] thread %d epollout after unlock\n", pthread_self());
             }
             else
@@ -397,18 +440,22 @@ int CEpoll::ProcessEpoll()
 //********************************************************************************************//
 void *CEpoll::readtask(void *args)
 {
+    int iThreadIndex = *((int*) &args); 
+    
     int fd = -1;
     int n, i;
+    
+    
     struct user_data* data = NULL;
     while(1)
     {
         //printf("[SERVER] thread %d readtask before lock\n", pthread_self());
         // protect task queue (readhead/readtail)
-        pthread_mutex_lock(&r_mutex); 
+        pthread_mutex_lock(&r_mutex[iThreadIndex ]); 
         //printf("[SERVER] thread %d readtask after lock\n", pthread_self());
         while(readhead == NULL)
             // if condl false, will unlock mutex
-            pthread_cond_wait(&r_condl, &r_mutex); 
+            pthread_cond_wait(&r_condl[iThreadIndex ], &r_mutex[iThreadIndex ]); 
 
         fd = readhead->data.fd;
         struct task* tmp = readhead;
@@ -416,7 +463,7 @@ void *CEpoll::readtask(void *args)
         free(tmp);
 
         //printf("[SERVER] thread %d readtask before unlock\n", pthread_self());
-        pthread_mutex_unlock(&r_mutex);
+        pthread_mutex_unlock(&r_mutex[iThreadIndex ]);
         //printf("[SERVER] thread %d readtask after unlock\n", pthread_self());
 
         printf("[SERVER] readtask %d handling %d\n", pthread_self(), fd);
@@ -466,17 +513,19 @@ void *CEpoll::readtask(void *args)
 //********************************************************************************************//
 void *CEpoll::writetask(void *args)
 {
-    unsigned int n;
+
+    int iThreadIndex = *((int*) &args); 
+     unsigned int n;
     // data to wirte back to client
     struct user_data *rdata = NULL;  
     while(1)
     {
         //printf("[SERVER] thread %d writetask before lock\n", pthread_self());
-        pthread_mutex_lock(&w_mutex);
+        pthread_mutex_lock(&w_mutex[iThreadIndex ]);
         //printf("[SERVER] thread %d writetask after lock\n", pthread_self());
         while(writehead == NULL)
             // if condl false, will unlock mutex
-            pthread_cond_wait(&w_condl, &w_mutex); 
+            pthread_cond_wait(&w_condl[iThreadIndex ], &w_mutex[iThreadIndex ]); 
 
         rdata = (struct user_data*)writehead->data.ptr;
         struct task* tmp = writehead;
@@ -484,7 +533,7 @@ void *CEpoll::writetask(void *args)
         free(tmp);
 
         //printf("[SERVER] thread %d writetask before unlock\n", pthread_self());
-        pthread_mutex_unlock(&w_mutex);
+        pthread_mutex_unlock(&w_mutex[iThreadIndex ]);
         //printf("[SERVER] thread %d writetask after unlock\n", pthread_self());
         
         printf("[SERVER] writetask %d sending %d : [%d] %s\n", pthread_self(), rdata->fd, rdata->n_size, rdata->line);
