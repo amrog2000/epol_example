@@ -1,3 +1,6 @@
+//*********************************************************************************************//
+//https://github.com/linfan/TCP-IP-Network-basic-examples/blob/master/chapter9/EpollServer.c
+//
 //********************************************************************************************//
 // socket interface
 #include <sys/socket.h>     
@@ -22,7 +25,8 @@
 // maximum received data byte
 #define MAXBTYE     10      
 #define OPEN_MAX    100
-#define LISTENQ     20
+//#define LISTENQ     20  >> Changed to MaxEvents
+
 #define SERV_PORT   10012
 #define INFTIM      1000
 #define LOCAL_ADDR  "127.0.0.1"
@@ -38,8 +42,7 @@ struct task
 };
 
 // for data transporting
-struct user_data                     
-{
+struct user_data {
     int fd;
     // real received data size
     unsigned int n_size;             
@@ -47,25 +50,142 @@ struct user_data
     char line[MAXBTYE];              
 };
 
-void *readtask(void *args);
-void *writetask(void *args);
+typedef struct CEpollCtorList {
+  
+  int MaxByte;     	// 10
+  int Open_Max;    	//100
+  int MaxEvents;     	//20
+  int Serv_Port;   	//10012
+  int _INFTIM;      	//1000
+  int Local_addr; 	// "127.0.0.1"
+  int iTimeOut;     	//500  
+  
+  int iNumOFileDescriptors;
+  
+  int 	iMaxReadThreads;  // Thread Pool for Read
+  int 	iMaxWriteThreads; // Thread Pool for Write
+  
+  int   iServerPort;
 
-// epoll descriptor from epoll_create()
-int epfd;                            
-// register epoll_ctl()
-struct epoll_event ev;               
-// store queued events from epoll_wait()
-struct epoll_event events[LISTENQ];  
-// mutex lock to protect readhead/readtail
-pthread_mutex_t r_mutex;             
-pthread_cond_t r_condl;
-// mutex lock to protect writehead/writetail
-pthread_mutex_t w_mutex;             
-pthread_cond_t w_condl;
-struct task *readhead = NULL, *readtail = NULL;
-struct task *writehead = NULL, *writetail = NULL;
+  int   iLoadFactor;  // Max load to a given thread until a new thread is added from the pool
+  
+}EPOLL_CTOR_LIST;
 
-void setnonblocking(int sock)
+class CEpoll {
+  
+public:
+ CEpoll(EPOLL_CTOR_LIST);
+ ~CEpoll();
+  
+private:  // yes yes it is by default
+  
+    int i, maxi, m_nfds;               
+//    int listenfd;
+    int  m_Socket;
+    int  connfd;
+    
+    int m_efd;
+    int m_MaxEvents;
+    
+    int   m_iTimeOut;
+    // task node
+    struct task *new_task = NULL;    
+    socklen_t clilen;
+    
+    int m_iServerPort;
+    struct sockaddr_in clientaddr;
+    struct sockaddr_in serveraddr;
+
+static    void *readtask(void *args);
+static    void *writetask(void *args);
+    // epoll descriptor from epoll_create()
+    int m_epfd;                            
+    // register epoll_ctl()
+    struct epoll_event ev;               
+    // store queued events from epoll_wait()
+//    struct epoll_event events[m_MaxEvents];
+     struct epoll_event* events;
+    
+    int   m_iNumOFileDescriptors;
+/*
+    pthread_t tid1, tid2;            
+    pthread_t tid3, tid4;            */
+
+
+    pthread_t  *pRThread;  // == tid1 or tid2
+    pthread_t  *pWThread;  // == tid1 or tid2
+    
+    pthread_mutex_t *r_mutex;             
+    pthread_cond_t  *r_condl;
+
+    pthread_mutex_t *w_mutex;             
+    pthread_cond_t  *w_condl;
+
+    struct task *readhead = NULL, *readtail = NULL;
+    struct task *writehead = NULL, *writetail = NULL;
+    
+    EPOLL_CTOR_LIST m_CtorList;
+    
+    int m_iError;
+    void setnonblocking(int sock);
+    
+public:    
+    int  PrepListener();
+    
+    int GetErrorCode();
+    int ProcessEpoll();
+    
+};
+//********************************************************************************************//
+CEpoll::CEpoll(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
+{
+//  m_CtorList = CtorList;
+  
+//   pThread;  // == tid1 or tid2
+   pRThread = new pthread_t [m_CtorList.iMaxReadThreads];
+   pWThread = new pthread_t [m_CtorList.iMaxWriteThreads];
+   
+   r_mutex = new pthread_mutex_t[m_CtorList.iMaxReadThreads];             
+   r_condl = new pthread_cond_t[m_CtorList.iMaxReadThreads];
+
+   w_mutex = new pthread_mutex_t[m_CtorList.iMaxWriteThreads ];       
+   w_condl = new pthread_cond_t[m_CtorList.iMaxWriteThreads ];
+   
+   m_iNumOFileDescriptors = m_CtorList.iNumOFileDescriptors;
+   m_MaxEvents = m_CtorList.MaxEvents;
+   m_iTimeOut = m_CtorList.iTimeOut ;
+   
+   events = new epoll_event[m_MaxEvents ];
+   
+   m_iServerPort = m_CtorList.iServerPort;
+
+   
+   
+  for (int ii = 0; ii < CtorList.iMaxReadThreads; ii++) {
+    pthread_mutex_init(&r_mutex[i], NULL);
+    pthread_cond_init(&r_condl[i], NULL);
+    
+    pthread_create(&pRThread[ii], NULL, readtask, NULL);    
+  }    
+
+  for (int ii = 0; ii < CtorList.iMaxWriteThreads; ii++) {
+    pthread_mutex_init(&w_mutex[i], NULL);
+    pthread_cond_init(&w_condl[i], NULL);
+    
+    pthread_create(&pWThread[ii], NULL, writetask, NULL);    
+  }    
+
+}
+//********************************************************************************************//
+CEpoll::~CEpoll()
+{
+
+   close(m_efd);  // Amro added this one...author did not close the file descriptor
+   delete[] events;
+      
+}
+//********************************************************************************************//
+void CEpoll::setnonblocking(int sock)
 {
     int opts;
     if ((opts = fcntl(sock, F_GETFL)) < 0)
@@ -79,6 +199,7 @@ void setnonblocking(int sock)
 int main(int argc,char* argv[])
 {
     // nfds is number of events (number of returned fd)
+/*
     int i, maxi, nfds;               
     int listenfd, connfd;
     // read task threads
@@ -91,6 +212,8 @@ int main(int argc,char* argv[])
     struct sockaddr_in clientaddr;
     struct sockaddr_in serveraddr;
 
+  
+    
     pthread_mutex_init(&r_mutex, NULL);
     pthread_cond_init(&r_condl, NULL);
     pthread_mutex_init(&w_mutex, NULL);
@@ -102,40 +225,95 @@ int main(int argc,char* argv[])
     // threads for respond to client
     pthread_create(&tid3, NULL, writetask, NULL);
     pthread_create(&tid4, NULL, writetask, NULL);
+*/
 
+  EPOLL_CTOR_LIST SEpoll_Ctor;
+  /*  initialize the structure here to construct the server
+   
+  SEpoll_Ctor.iLoadFactor = 
+  SEpoll_Ctor.iMaxReadThreads
+  SEpoll_Ctor.iMaxWriteThreads
+  SEpoll_Ctor.iMaxWriteThreads
+  SEpoll_Ctor.iNumOFileDescriptors
+  SEpoll_Ctor.iServerPort
+  SEpoll_Ctor.iTimeOut
+  SEpoll_Ctor.Local_addr
+  SEpoll_Ctor.MaxByte
+  SEpoll_Ctor.Open_Max
+  
+  */
+
+ CEpoll* pCEpoll = nullptr;
+ 
+ pCEpoll = new CEpoll(SEpoll_Ctor);
+
+ if (pCEpoll->GetErrorCode() > 100)
+ {
+   
+ }
+ 
+ pCEpoll->PrepListener();
+ if (pCEpoll->GetErrorCode() > 100)
+ {
+   
+ }
+ 
+ pCEpoll->ProcessEpoll();
+ if (pCEpoll->GetErrorCode() > 100)
+ {
+   
+ }
+ delete pCEpoll;
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+int CEpoll::PrepListener()
+{
     // epoll descriptor, for handling accept
-    epfd = epoll_create(256);        
-    listenfd = socket(PF_INET, SOCK_STREAM, 0);
+    m_efd = epoll_create(m_MaxEvents);        
+    m_Socket = socket(PF_INET, SOCK_STREAM, 0);
     // set the descriptor as non-blocking
-    setnonblocking(listenfd);        
+    setnonblocking(m_Socket);        
+
     // event related descriptor
-    ev.data.fd = listenfd;           
+    ev.data.fd = m_Socket;           
+
     // monitor in message, edge trigger
     ev.events = EPOLLIN | EPOLLET;   
+
     // register epoll event
-    epoll_ctl(epfd, EPOLL_CTL_ADD, listenfd, &ev);    
+    epoll_ctl(m_efd, EPOLL_CTL_ADD, m_Socket, &ev);    
 
     bzero(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
     char *local_addr = LOCAL_ADDR;
     inet_aton(local_addr, &(serveraddr.sin_addr));
-    serveraddr.sin_port = htons(SERV_PORT);
-    bind(listenfd, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
-    listen(listenfd, LISTENQ);
+    serveraddr.sin_port = htons(m_iServerPort);
+    bind(m_Socket, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    listen(m_Socket, m_MaxEvents);
+    
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+int CEpoll::GetErrorCode()
+{
+  return m_iError;
 
-    maxi = 0;
-    for(;;)
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+int CEpoll::ProcessEpoll()
+{
+  
+  for(;;)
     {
         // waiting for epoll event
-        nfds = epoll_wait(epfd, events, LISTENQ, TIMEOUT);     
+        m_nfds = epoll_wait(m_efd, events, m_MaxEvents, m_iTimeOut);     
         // In case of edge trigger, must go over each event
-        for (i = 0; i < nfds; ++i)   
+        for (i = 0; i < m_nfds; ++i)   
         {
             // Get new connection
-            if (events[i].data.fd == listenfd)   
+            if (events[i].data.fd == m_Socket)   
             {
                 // accept the client connection
-                connfd = accept(listenfd, (struct sockaddr*)&clientaddr, &clilen);
+                connfd = accept(m_Socket, (struct sockaddr*)&clientaddr, &clilen);
                 if (connfd < 0)
                     printf("connfd < 0");
                 setnonblocking(connfd);
@@ -144,7 +322,7 @@ int main(int argc,char* argv[])
                 // monitor in message, edge trigger
                 ev.events = EPOLLIN | EPOLLET;   
                 // add fd to epoll queue
-                epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &ev);   
+                epoll_ctl(m_efd, EPOLL_CTL_ADD, connfd, &ev);   
             }
             // Received data
             else if (events[i].events & EPOLLIN) 
@@ -217,7 +395,7 @@ int main(int argc,char* argv[])
     return 0;
 }
 //********************************************************************************************//
-void *readtask(void *args)
+void *CEpoll::readtask(void *args)
 {
     int fd = -1;
     int n, i;
@@ -278,14 +456,15 @@ void *readtask(void *args)
                 // Modify event to EPOLLOUT
                 ev.events = EPOLLOUT | EPOLLET;    
                 // modify moditored fd event
-                epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);       
+                epoll_ctl(m_efd, EPOLL_CTL_MOD, fd, &ev);       
             }
         }
     }
+    
 }
 
 //********************************************************************************************//
-void *writetask(void *args)
+void *CEpoll::writetask(void *args)
 {
     unsigned int n;
     // data to wirte back to client
@@ -328,7 +507,7 @@ void *writetask(void *args)
             // monitor in message, edge trigger
             ev.events = EPOLLIN | EPOLLET;   
             // modify moditored fd event
-            epoll_ctl(epfd, EPOLL_CTL_MOD, rdata->fd, &ev);   
+            epoll_ctl(m_efd, EPOLL_CTL_MOD, rdata->fd, &ev);   
         }
         // delete data
         free(rdata);        
