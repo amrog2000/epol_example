@@ -6,7 +6,7 @@ BIN = bin/QuantCom
 ############### List All the .cpp files here....################
 ##### All Header files are included in the .cpp and compiled accordingly #######
 
-SRCS = 	main.cpp
+SRCS = 	main.cpp  ComLog.cpp
 	 
 ############### List all the includes paths here....############
 #INCLUDES = -I/home/amro/projects/QuantCom  -I../Include   -I../Common 
