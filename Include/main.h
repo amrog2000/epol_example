@@ -4,6 +4,7 @@
 //********************************************************************************************//
 // socket interface
 #include <sys/socket.h>     
+#include <netdb.h>
 // epoll interface
 #include <sys/epoll.h>      
 // struct sockaddr_in
@@ -20,6 +21,7 @@
 // malloc(), free()
 #include <stdlib.h>         
 #include <errno.h>
+#include <string>
 //extern int errno;
 
 // maximum received data byte
@@ -30,14 +32,18 @@
 #define SERV_PORT   10012
 #define INFTIM      1000
 #define LOCAL_ADDR  "127.0.0.1"
+
+#define   SERVER_PORT_SIZE 10
 // #define TIMEOUT     500
 
+using namespace std;
 enum tstate {
     TS_INACTIVE,
     TS_STARTING,
     TS_STARTED,
     TS_ALIVE,
     TS_TERMINATED,
+    TS_STOPPING,
     TS_JOINED
 };
 
@@ -72,18 +78,16 @@ typedef struct CEpollCtorList {
   int MaxByte;     	// 10
   int Open_Max;    	//100
   int MaxEvents;     	//20
-  int Serv_Port;   	//10012
+  char szServerPort[SERVER_PORT_SIZE];   	//10012
   int _INFTIM;      	//1000
   int Local_addr; 	// "127.0.0.1"
   int iTimeOut;     	//500  
   
   int iNumOFileDescriptors;
   
-  int 	iMaxReadThreads;  // Thread Pool for Read
-  int 	iMaxWriteThreads; // Thread Pool for Write
+  int 	nReadThreads;  // Thread Pool for Read
+  int 	nWriteThreads; // Thread Pool for Write
   
-  int   iServerPort;
-
   int   iLoadFactor;  // Max load to a given thread until a new thread is added from the pool
   
 }EPOLL_CTOR_LIST;
@@ -107,9 +111,9 @@ static    int m_efd;
     int   m_iTimeOut;
     // task node
     struct task *new_task = NULL;    
-    socklen_t clilen;
+
     
-    int m_iServerPort;
+    char   m_szServerPort[SERVER_PORT_SIZE];
     struct sockaddr_in clientaddr;
     struct sockaddr_in serveraddr;
 
@@ -121,7 +125,7 @@ static    void *writetask(void *args);
 static    struct epoll_event ev;               
     // store queued events from epoll_wait()
 //    struct epoll_event events[m_MaxEvents];
-     struct epoll_event* events;
+     struct epoll_event* eventList;
     
     int   m_iNumOFileDescriptors;
 /*
@@ -148,7 +152,10 @@ static    struct task *writehead, *writetail;
     
     int m_iReadMutexIndex;
     int m_iWriteMutexIndex;
-
+    double Get_CPU_Time(void);
+    
+static    string m_strLogMsg;
+    
     
 public:    
     int  PrepListener();
@@ -157,7 +164,7 @@ public:
     int ProcessEpoll();
     int TerminateThreads();
     
-    THREAD_INFO* m_arrThreadInfo;
+static    THREAD_INFO* m_arrThreadInfo;
     
 };
 
@@ -171,5 +178,7 @@ struct task *CEpoll::readhead = NULL, *CEpoll::readtail = NULL;
 struct task *CEpoll::writehead = NULL, *CEpoll::writetail = NULL;
 
 int CEpoll::m_efd;
-struct epoll_event CEpoll::ev ;               
+struct epoll_event CEpoll::ev ;          
+THREAD_INFO*       CEpoll::m_arrThreadInfo;
+string CEpoll::m_strLogMsg;
 
