@@ -1,6 +1,4 @@
-
 #include "sys/resource.h"
-
 #include "main.h"
 
 #include "ComLog.h"
@@ -25,7 +23,9 @@ int main(int argc,char* argv[])
   SEpoll_Ctor.Open_Max
   */
 
+ CComLog::instance().log("===========================================================================================================================", CComLog::Info);
  CComLog::instance().log("Starting EPOll Server", CComLog::Info);
+ CComLog::instance().log("===========================================================================================================================", CComLog::Info);
  
  CEpollServer* pCEpoll = nullptr;
  

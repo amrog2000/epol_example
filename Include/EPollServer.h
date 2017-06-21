@@ -124,26 +124,20 @@ static    void *readtask(void *args);
 static    void *writetask(void *args);
     // epoll descriptor from epoll_create()
     int m_epfd;                            
-    // register epoll_ctl()
+
 static    struct epoll_event ev;               
-    // store queued events from epoll_wait()
-//    struct epoll_event events[m_MaxEvents];
      struct epoll_event* eventList;
     
     int   m_iNumOFileDescriptors;
-/*
-    pthread_t tid1, tid2;            
-    pthread_t tid3, tid4;            */
 
-
-    pthread_t  *pRThread;  // == tid1 or tid2
-    pthread_t  *pWThread;  // == tid1 or tid2
+    pthread_t  *pR_Thread;  //
+    pthread_t  *pW_Thread;  //
     
-static    pthread_mutex_t *r_mutex;             
-static    pthread_cond_t  *r_condl;
+static    pthread_mutex_t *pR_Mutex;             
+static    pthread_cond_t  *pR_Condl;
 
-static    pthread_mutex_t *w_mutex;             
-static    pthread_cond_t  *w_condl;
+static    pthread_mutex_t *pW_Mutex;             
+static    pthread_cond_t  *pW_Condl;
 
 static    struct task *readhead, *readtail;
 static    struct task *writehead, *writetail;
