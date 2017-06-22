@@ -10,7 +10,7 @@ struct task *CEpollServer::readhead = nullptr, *CEpollServer::readtail = nullptr
 struct task *CEpollServer::writehead = nullptr, *CEpollServer::writetail = nullptr;
 
 int 			CEpollServer::m_efd;
-struct epoll_event 	CEpollServer::ev ;
+struct epoll_event 	CEpollServer::m_ev ;
 
 THREAD_INFO*       CEpollServer::m_arrThreadInfo;
 string 		   CEpollServer::m_strLogMsg;
@@ -30,7 +30,7 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
     pW_Mutex = new pthread_mutex_t[m_CtorList.nWriteThreads ]; 	// array of Read threads
     pW_Condl = new pthread_cond_t[m_CtorList.nWriteThreads ]; 	// array of  Write conditional Variables
 
-    m_iNumOFileDescriptors = m_CtorList.iNumOFileDescriptors;  
+    m_iNumOFileDescriptors = m_CtorList.iNumOFileDescriptors;
     m_MaxEvents = m_CtorList.MaxEvents;
     m_iTimeOut = m_CtorList.iTimeOut ;
 
@@ -79,31 +79,30 @@ CEpollServer::~CEpollServer()
 
     CComLog::instance().log("Deleting Events", CComLog::Info);
     if (eventList)
-      delete[] eventList;
+        delete[] eventList;
 
     CComLog::instance().log("Deleting Threads Array", CComLog::Info);
-    
+
     if (pR_Thread)
-      delete [] pR_Thread  ;
-    
+        delete [] pR_Thread  ;
     if (pW_Thread)
-      delete []  pW_Thread ;
+        delete []  pW_Thread ;
 
     CComLog::instance().log("Deleting Mutex Array", CComLog::Info);
     if (pR_Mutex)
-      delete []  pR_Mutex ;
+        delete []  pR_Mutex ;
     if (pW_Mutex)
-      delete []  pW_Mutex ;
+        delete []  pW_Mutex ;
 
     CComLog::instance().log("Deleting Conditional Variables Array", CComLog::Info);
     if (pR_Condl)
-      delete []  pR_Condl ;
+        delete []  pR_Condl ;
     if (pW_Condl)
-      delete []  pW_Condl ;
+        delete []  pW_Condl ;
 
     CComLog::instance().log("Deleting Threads Array", CComLog::Info);
     if (m_arrThreadInfo)
-    delete [] m_arrThreadInfo;
+        delete [] m_arrThreadInfo;
 
 
     CComLog::instance().log("Destruction Completed", CComLog::Info);
@@ -121,7 +120,13 @@ void CEpollServer::setnonblocking(int sock)
     if (fcntl(sock, F_SETFL, opts) < 0) {
         m_strLogMsg = "SETFL " + to_string( sock) + " Failed"; //"GETFL %d failed", sock);
         CComLog::instance().log(m_strLogMsg, CComLog::Error);
+        int iSendBuffSize = 9728;
+        int iRecvBuffSize = 2048;
 
+
+        int iRet =   setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &iSendBuffSize, sizeof iSendBuffSize);
+        iRet =   setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &iRecvBuffSize, sizeof iRecvBuffSize);
+        // check for errors by getsockopt
     }
 }
 
@@ -183,10 +188,10 @@ int CEpollServer::PrepListener()
         return -1;
     }
 
-    ev.data.fd = m_Socket;
-    ev.events = EPOLLIN | EPOLLET;
+    m_ev.data.fd = m_Socket;
+    m_ev.events = EPOLLIN | EPOLLET;
 
-    s = epoll_ctl (m_efd, EPOLL_CTL_ADD, sfd, &ev);
+    s = epoll_ctl (m_efd, EPOLL_CTL_ADD, sfd, &m_ev);
 
     if (s == -1)
     {
@@ -230,22 +235,17 @@ int CEpollServer::ProcessEpoll()
 //                connfd = accept(m_Socket, (struct sockaddr*)&clientaddr, &in_len);
                 connfd = accept(m_Socket, &in_addr, &in_len);
 
-                if (connfd < 0) {
+                if (connfd == -1) {
                     CComLog::instance().log("connfd < 0", CComLog::Error);
                     iRet++;
-                    if (iRet > 10) {
-                        m_strLogMsg = "Accept Error: " +  to_string(iRet) + " times on: " ;
-                        CComLog::instance().log(m_strLogMsg, CComLog::Error);
-
-                        m_strLogMsg = "[SERVER] connect from: ";
-                        m_strLogMsg += inet_ntoa(clientaddr.sin_addr);
-
-                        CComLog::instance().log(m_strLogMsg, CComLog::Error);
-
+                    if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) { /* We have processed all incoming connections. */
                         break;
                     }
-                    continue;
-                }
+                    else {
+                        perror ("accept");
+                        break;
+                    }
+                } // if (connfd == -1) {
 
                 setnonblocking(connfd);
                 m_strLogMsg = "[SERVER] connect from";
@@ -253,10 +253,7 @@ int CEpollServer::ProcessEpoll()
                 CComLog::instance().log(m_strLogMsg, CComLog::Debug);
 //                CComLog::instance().log(m_strLogMsg);"[SERVER] connect from %s \n", inet_ntoa(clientaddr.sin_addr));
 
-                iRet = getnameinfo (&in_addr, in_len,
-                                    hbuf, sizeof hbuf,
-                                    sbuf, sizeof sbuf,
-                                    NI_NUMERICHOST | NI_NUMERICSERV);
+                iRet = getnameinfo (&in_addr, in_len,  hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
                 if (iRet == 0) {
                     m_strLogMsg = "Accepted connection on descriptor:  " +  to_string(connfd) + "Host: " + hbuf + "Port: " + sbuf  ;
                     CComLog::instance().log(m_strLogMsg, CComLog::Info);
@@ -265,12 +262,12 @@ int CEpollServer::ProcessEpoll()
 //                              "(host=%s, port=%s)\n", connfd, , );
                 }
 
-                ev.data.fd = connfd;
+                m_ev.data.fd = connfd;
                 // monitor in message, edge trigger
-                ev.events = EPOLLIN | EPOLLET;
+                m_ev.events = EPOLLIN | EPOLLET;
                 // add fd to epoll queue
-                epoll_ctl(m_efd, EPOLL_CTL_ADD, connfd, &ev);
-            }
+                epoll_ctl(m_efd, EPOLL_CTL_ADD, connfd, &m_ev);
+            }  // if (eventList[i].data.fd == m_Socket)
             // Received data
             else if (eventList[i].events & EPOLLIN)
             {
@@ -363,7 +360,7 @@ void *CEpollServer::readtask(void *args)
     int n, i;
 
     struct task* tmp = nullptr;
-    
+
     m_arrThreadInfo[iThreadIndex].eState = TS_STARTED;
 
     struct user_data* data = nullptr;
@@ -393,8 +390,7 @@ void *CEpollServer::readtask(void *args)
         data =  new (user_data);
 
         data->fd = fd;
-        if ((n = recv(fd, data->line, MAXBTYE, 0)) < 0)
-        {
+        if ((n = recv(fd, data->line, MAXBTYE, 0)) < 0) {
             if (errno == ECONNRESET)
                 close(fd);
             m_strLogMsg = "[SERVER] Error: readline failed: " ;
@@ -404,19 +400,16 @@ void *CEpollServer::readtask(void *args)
             if (data != nullptr)
                 delete(data);
         }
-        else if (n == 0)
-        {
+        else if (n == 0) {
             close(fd);
             m_strLogMsg = "[SERVER] Error: client" + to_string(fd) + "closed connection " ;
             CComLog::instance().log(m_strLogMsg, CComLog::Error);
             if (data != nullptr)
                 delete(data);
         }
-        else
-        {
+        else {
             data->n_size = n;
-            for (i = 0; i < n; ++i)
-            {
+            for (i = 0; i < n; ++i) {
                 if (data->line[i] == '\n' || data->line[i] > 128)
                 {
                     data->line[i] = '\0';
@@ -427,12 +420,11 @@ void *CEpollServer::readtask(void *args)
             m_strLogMsg = "[SERVER] readtask: "  + to_string (pthread_self()) + to_string(fd) + to_string(data->n_size) + data->line;
             CComLog::instance().log(m_strLogMsg, CComLog::Info);
 
-            if (data->line[0] != '\0')
-            {
+            if (data->line[0] != '\0') {
                 // modify monitored event to EPOLLOUT,  wait next loop to send respond
-                ev.data.ptr = data;
-                ev.events = EPOLLOUT | EPOLLET;
-                epoll_ctl(m_efd, EPOLL_CTL_MOD, fd, &ev);
+                m_ev.data.ptr = data;
+                m_ev.events = EPOLLOUT | EPOLLET;
+                epoll_ctl(m_efd, EPOLL_CTL_MOD, fd, &m_ev);
             }
         }
         if (m_arrThreadInfo[iThreadIndex].eState == TS_STOPPING ) {
@@ -488,9 +480,9 @@ void *CEpollServer::writetask(void *args)
         }
         else
         {
-            ev.data.fd = rdata->fd;
-            ev.events = EPOLLIN | EPOLLET;
-            epoll_ctl(m_efd, EPOLL_CTL_MOD, rdata->fd, &ev);
+            m_ev.data.fd = rdata->fd;
+            m_ev.events = EPOLLIN | EPOLLET;
+            epoll_ctl(m_efd, EPOLL_CTL_MOD, rdata->fd, &m_ev);
         }
         if (m_arrThreadInfo[iThreadIndex].eState == TS_STOPPING ) {
             break;

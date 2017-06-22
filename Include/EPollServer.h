@@ -125,7 +125,7 @@ static    void *writetask(void *args);
     // epoll descriptor from epoll_create()
     int m_epfd;                            
 
-static    struct epoll_event ev;               
+static    struct epoll_event m_ev;               
      struct epoll_event* eventList;
     
     int   m_iNumOFileDescriptors;
