@@ -86,14 +86,31 @@ void CComLog::logHelper(const std::string& inMessage, const std::string& inLogLe
     time_t ltime = 0;
     struct tm stToday;
 
-    char	szLogTime[26];
+    char	szLogTime[SIZE_OF_DATE_TIME];
     time( &ltime );
     localtime_r( &ltime ,  &stToday);
 
-    memset(szLogTime, 0 , 26);
-    strftime(szLogTime, 26, "%Y-%m-%d- %H:%M:%S" , &stToday);
+    memset(szLogTime, 0 , SIZE_OF_DATE_TIME);
+    strftime(szLogTime, SIZE_OF_DATE_TIME, "%Y-%m-%d- %H:%M:%S" , &stToday);
     mOutputStream << szLogTime << ": " << inLogLevel << " : " << inMessage << endl;
 }
+///////////////////////////////////////////////////////////////////////////////////
+char* CComLog::GetFormatedDateTime()
+{
+    // Add logger time in the first column !!!
+    time_t ltime = 0;
+    struct tm stToday;
+
+    char	szDateTime[SIZE_OF_DATE_TIME];
+    time( &ltime );
+    localtime_r( &ltime ,  &stToday);
+
+    memset(szDateTime, 0 , SIZE_OF_DATE_TIME);
+    strftime(szDateTime, 26, "%Y-%m-%d- %H:%M:%S" , &stToday);
+    
+    return szDateTime;
+ }
+
 ///////////////////////////////////////////////////////////////////////////////////
 char* CComLog::GetFormatedDate()
 {

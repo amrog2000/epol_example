@@ -8,7 +8,7 @@
 #include <mutex>
 
 #define   SIZE_OF_FORMATED_DATE 12+1
-
+#define   SIZE_OF_DATE_TIME  26+1
 // Definition of a multithread safe singleton logger class
 class CComLog
 {
@@ -28,6 +28,7 @@ public:
 	void log(const std::vector<std::string>& inMessages, 
 		const std::string& inLogLevel);
 
+	char* GetFormatedDateTime();
 protected:
 	// Static variable for the one-and-only instance  
 	static CComLog* pInstance;

@@ -6,8 +6,9 @@ pthread_cond_t  *CEpollServer::pR_Condl;
 pthread_mutex_t *CEpollServer::pW_Mutex;
 pthread_cond_t  *CEpollServer::pW_Condl;
 
-struct task *CEpollServer::readhead = nullptr, *CEpollServer::readtail = nullptr;
-struct task *CEpollServer::writehead = nullptr, *CEpollServer::writetail = nullptr;
+TASK_QUEUE CEpollServer::m_TaskQue = {0};
+// struct task *CEpollServer::readhead = nullptr, *CEpollServer::readtail = nullptr;
+// struct task *CEpollServer::writehead = nullptr, *CEpollServer::writetail = nullptr;
 
 int 			CEpollServer::m_efd;
 struct epoll_event 	CEpollServer::m_ev ;
@@ -62,10 +63,32 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
     }
 
     m_efd = epoll_create(m_MaxEvents);
-    eventList= new epoll_event[m_MaxEvents ];
+    eventList = nullptr;
+    
+    eventList = new epoll_event[m_MaxEvents];
+    if (!eventList) {
+      m_iError = 1000;
+      
+     // ::TODO log error 
+    }
+    
+    memset(m_szUserFileName, '\0', MAX_PATH);
+    strcpy(m_szUserFileName, m_CtorList.szUserFileName);
 
-    m_iReadMutexIndex 	= 0;
+    m_iReadMutexIndex 		= 0;
     m_iWriteMutexIndex  	= 0;
+    
+    m_TaskQue.readhead 		= nullptr;
+    m_TaskQue.readtail 		= nullptr;
+    
+    m_TaskQue.uiReadTasksInQ  	= 0;
+    m_TaskQue.uiWriteTasksInQ 	= 0;
+    
+    m_TaskQue.uiTotalWriteTasks = 0;
+    m_TaskQue.uiTotalReadTasks  = 0;
+    
+    m_TaskQue.writehead 	= nullptr;
+    m_TaskQue.readtail 		= nullptr;
 
 }
 //********************************************************************************************//
@@ -107,26 +130,64 @@ CEpollServer::~CEpollServer()
 
     CComLog::instance().log("Destruction Completed", CComLog::Info);
 }
+
 //********************************************************************************************//
-void CEpollServer::setnonblocking(int sock)
+CEpollServer::CEpollServer(char *szFileName) //Constructor for adding user names
+{
+  
+  strcpy( m_szUserFileName, szFileName);
+  
+}
+//********************************************************************************************//
+int CEpollServer::AddUser(char* szUserName, char* szPassword)
+{
+
+  m_strLogMsg = "User: " + string(szUserName) + " Added ";
+  
+  CComLog::instance().log(m_strLogMsg, CComLog::Info);
+  return true;
+}
+//********************************************************************************************//
+bool CEpollServer::AuthenticateUser(char* szUserName, char* szPassword)
+{
+  
+  return true;
+}
+//********************************************************************************************//
+int CEpollServer::LoadUserFile()
+{
+  
+
+  return true;
+}
+//********************************************************************************************//
+int CEpollServer::SaveUserFile()
+{
+
+  return true;
+}
+//********************************************************************************************//
+void CEpollServer::setnonblocking(int iSocket)
 {
     int opts;
-    if ((opts = fcntl(sock, F_GETFL)) < 0) {
-        m_strLogMsg = "GETFL " + to_string( sock) + " Failed"; //"GETFL %d failed", sock);
+    if ((opts = fcntl(iSocket, F_GETFL)) < 0) {
+        m_strLogMsg = "GETFL " + to_string( iSocket) + " Failed"; //"GETFL %d failed", iSocket);
         CComLog::instance().log(m_strLogMsg, CComLog::Error);
     }
 
+    int iRet = 0;
     opts = opts | O_NONBLOCK;
-    if (fcntl(sock, F_SETFL, opts) < 0) {
-        m_strLogMsg = "SETFL " + to_string( sock) + " Failed"; //"GETFL %d failed", sock);
+    if (fcntl(iSocket, F_SETFL, opts) < 0) {
+        m_strLogMsg = "SETFL " + to_string( iSocket) + " Failed"; //"GETFL %d failed", iSocket);
         CComLog::instance().log(m_strLogMsg, CComLog::Error);
         int iSendBuffSize = 9728;
         int iRecvBuffSize = 2048;
 
 
-        int iRet =   setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &iSendBuffSize, sizeof iSendBuffSize);
-        iRet =   setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &iRecvBuffSize, sizeof iRecvBuffSize);
-        // check for errors by getsockopt
+        iRet =   setsockopt(iSocket, SOL_SOCKET, SO_SNDBUF, &iSendBuffSize, sizeof iSendBuffSize);
+	// check for errors by getiSocketopt
+        iRet =   setsockopt(iSocket, SOL_SOCKET, SO_RCVBUF, &iRecvBuffSize, sizeof iRecvBuffSize);
+        // check for errors by getiSocketopt
     }
 }
 
@@ -202,6 +263,7 @@ int CEpollServer::PrepListener()
 
     return sfd;
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 int CEpollServer::GetErrorCode()
 {
@@ -242,7 +304,7 @@ int CEpollServer::ProcessEpoll()
                         break;
                     }
                     else {
-                        perror ("accept");
+                        CComLog::instance().log("accept error", CComLog::Error);
                         break;
                     }
                 } // if (connfd == -1) {
@@ -271,34 +333,40 @@ int CEpollServer::ProcessEpoll()
             // Received data
             else if (eventList[i].events & EPOLLIN)
             {
-                if (eventList[i].data.fd < 0)
-                    continue;
+                 if (eventList[i].data.fd < 0)
+                     continue;
                 m_strLogMsg = "[SERVER] put task: "+ to_string(eventList[i].data.fd) + " To read queue" ;
 
                 CComLog::instance().log(m_strLogMsg, CComLog::Info);
 
 //                new_task = (task*) malloc(sizeof(struct task));
                 new_task = new task;
-
                 new_task->data.fd = eventList[i].data.fd;
                 new_task->next = nullptr;
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin before lock\n", pthread_self());
                 // protect task queue (readhead/readtail)
+
+		if (m_iReadMutexIndex++ > m_CtorList.nReadThreads)
+                    m_iReadMutexIndex = 0;
+		
                 pthread_mutex_lock(&pR_Mutex[m_iReadMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin after lock\n", pthread_self());
                 // the queue is empty
-                if (readhead == nullptr)
+                if (m_TaskQue.readhead == nullptr)
                 {
-                    readhead = new_task;
-                    readtail = new_task;
+                    m_TaskQue.readhead = new_task;
+                    m_TaskQue.readtail = new_task;
                 }
                 // queue is not empty
                 else
                 {
-                    readtail->next = new_task;
-                    readtail = new_task;
+                    m_TaskQue.readtail->next = new_task;
+                    m_TaskQue.readtail = new_task;
                 }
-                pthread_cond_broadcast(&pR_Condl[m_iReadMutexIndex]);
+        	m_TaskQue.uiReadTasksInQ++;
+		m_TaskQue.uiTotalReadTasks++;
+
+                pthread_cond_broadcast(&pR_Condl[ m_iReadMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin before unlock\n", pthread_self());
                 pthread_mutex_unlock(&pR_Mutex[m_iReadMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin after unlock\n", pthread_self());
@@ -309,9 +377,6 @@ int CEpollServer::ProcessEpoll()
                 if (eventList[i].data.ptr == nullptr)
                     continue;
 
-                if (m_iWriteMutexIndex++ > m_CtorList.nWriteThreads)
-                    m_iWriteMutexIndex = 0;
-
                 m_strLogMsg = "[SERVER] put task: " + to_string(((struct task*)eventList[i].data.ptr)->data.fd) + "To write queue";
                 CComLog::instance().log(m_strLogMsg, CComLog::Info);
 
@@ -321,20 +386,28 @@ int CEpollServer::ProcessEpoll()
                 new_task->next = nullptr;
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollout before lock\n", pthread_self());
 //                pthread_mutex_lock(&pW_Mutex);
+
+		if (m_iWriteMutexIndex++ > m_CtorList.nWriteThreads)
+                    m_iWriteMutexIndex = 0;
+		
                 pthread_mutex_lock(&pW_Mutex[m_iWriteMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollout after lock\n", pthread_self());
                 // the queue is empty
-                if (writehead == nullptr)
+                if (m_TaskQue.writehead == nullptr)
                 {
-                    writehead = new_task;
-                    writetail = new_task;
+                    m_TaskQue.writehead = new_task;
+                    m_TaskQue.writetail = new_task;
                 }
                 // queue is not empty
                 else
                 {
-                    writetail->next = new_task;
-                    writetail = new_task;
+                    m_TaskQue.writetail->next = new_task;
+                    m_TaskQue.writetail = new_task;
                 }
+                
+              	m_TaskQue.uiWriteTasksInQ++;
+		m_TaskQue.uiTotalWriteTasks++;
+
                 // trigger writetask thread
 //                pthread_cond_broadcast(&pW_Condl);
                 pthread_cond_broadcast(&pW_Condl[m_iWriteMutexIndex]);
@@ -370,14 +443,16 @@ void *CEpollServer::readtask(void *args)
         // protect task queue (readhead/readtail)
         pthread_mutex_lock(&pR_Mutex[iThreadIndex ]);
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d readtask after lock\n", pthread_self());
-        while(readhead == nullptr)
+        while(m_TaskQue.readhead == nullptr)
             // if condl false, will unlock mutex
             pthread_cond_wait(&pR_Condl[iThreadIndex ], &pR_Mutex[iThreadIndex ]);
 
-        fd = readhead->data.fd;
-        tmp = readhead;
-        readhead = readhead->next;
+        fd = m_TaskQue.readhead->data.fd;
+        tmp = m_TaskQue.readhead;
+        m_TaskQue.readhead = m_TaskQue.readhead->next;
         delete(tmp);
+       	m_TaskQue.uiReadTasksInQ--;
+
 
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d readtask before unlock\n", pthread_self());
         pthread_mutex_unlock(&pR_Mutex[iThreadIndex ]);
@@ -447,14 +522,15 @@ void *CEpollServer::writetask(void *args)
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d writetask before lock\n", pthread_self());
         pthread_mutex_lock(&pW_Mutex[iThreadIndex ]);
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d writetask after lock\n", pthread_self());
-        while(writehead == nullptr)
+        while(m_TaskQue.writehead == nullptr)
             // if condl false, will unlock mutex
             pthread_cond_wait(&pW_Condl[iThreadIndex ], &pW_Mutex[iThreadIndex ]);
 
-        rdata = (struct user_data*)writehead->data.ptr;
-        struct task* tmp = writehead;
-        writehead = writehead->next;
+        rdata = (struct user_data*)m_TaskQue.writehead->data.ptr;
+        struct task* tmp = m_TaskQue.writehead;
+        m_TaskQue.writehead = m_TaskQue.writehead->next;
         delete(tmp);
+	m_TaskQue.uiWriteTasksInQ--;
 
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d writetask before unlock\n", pthread_self());
         pthread_mutex_unlock(&pW_Mutex[iThreadIndex ]);
@@ -527,7 +603,6 @@ double CEpollServer::Get_CPU_Time(void)  // incomplete method....
 //********************************************************************************************//
 int CEpollServer::TerminateThreads()
 {
-
     std::string strExitMessage;
 
     int iJoined = 0;
@@ -581,3 +656,9 @@ int CEpollServer::TerminateThreads()
 
     return true;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TASK_QUEUE CEpollServer::GetQueueStatus()
+{
+  return m_TaskQue;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

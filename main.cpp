@@ -49,13 +49,16 @@ int main(int argc,char* argv[])
       exit(EXIT_FAILURE);
  }
  
- pCEpoll->ProcessEpoll();
+ pCEpoll->ProcessEpoll();   // main driver loop here
  if (pCEpoll->GetErrorCode() > 100)
  {
       CComLog::instance().log("Failure to Process EPOll Server", CComLog::Error);
       delete pCEpoll;
       exit(EXIT_FAILURE);
  }
+ 
+ TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();
+ // output TQueue
  
  pCEpoll->TerminateThreads();
  
