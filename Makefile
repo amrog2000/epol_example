@@ -1,12 +1,10 @@
 # Define executable name
-#QuantCom 	QuantCom	QuantCom	QuantCom	QuantCom	QuantCom	
-#QuantCom	QuantCom	QuantCom	QuantCom
 BIN = bin/QuantCom
 
 ############### List All the .cpp files here....################
 ##### All Header files are included in the .cpp and compiled accordingly #######
 
-SRCS = 	main.cpp EPollServer.cpp ComLog.cpp
+SRCS = 	main.cpp EPollServer.cpp ComLog.cpp Cuserdb.cpp
 	 
 ############### List all the includes paths here....############
 #INCLUDES = -I/home/amro/projects/QuantCom  -I../Include   -I../Common 

@@ -26,6 +26,7 @@
 // #include <sys/resource.h>
 
 #include "ComLog.h"
+#include "Cuserdb.h"
 
 // maximum received data byte
 #define MAXBTYE     10
@@ -38,43 +39,8 @@
 
 #define   SERVER_PORT_SIZE 10
 // #define TIMEOUT     500
-#define MAX_PATH 256
-
-#define SIZE_USERNAME 15
-#define SIZE_PASSWORD 15
-
-
 
 using namespace std;
-
-enum UserStatus {
-
-    INVALID_USER_NAME,
-    INVALID_PASSWORD,
-    INVALID_FILENAME,
-    USER_ALREADY_EXIST,
-    USER_INACTIVE
-};
-
-
-typedef struct SUserRecord {
-    char szUserName[SIZE_USERNAME];
-    char szPassword[SIZE_PASSWORD];
-    int iGroupID;  // in case you want to assign something to the whole group
-    int iAccessLevel;
-
-    bool bActive;
-
-    char  szLastLoginTime[SIZE_OF_DATE_TIME ];
-    char  szLastLogoutTime[SIZE_OF_DATE_TIME ];
-
-    char  szDateAccountCreated[SIZE_OF_FORMATED_DATE];
-    char  szDateAccountTerminated[SIZE_OF_FORMATED_DATE];
-
-    char  szLastMessage[MAX_PATH ];
-
-} USER_RECORD;
-
 
 enum tstate {
     TS_INACTIVE,
@@ -207,15 +173,9 @@ private:  // yes yes it is by default
     static    string m_strLogMsg;
     static TASK_QUEUE m_TaskQue;
 
-
     char  m_szUserFileName[MAX_PATH];
-
+    CuserDB* m_pCuserDB;
     bool AuthenticateUser(char* szUserName, char* szPassword);
-
-    int AddUser(char* szUserName, char* szPassword);
-    int LoadUserFile();
-    int SaveUserFile();
-
 
 public:
     int  PrepListener();

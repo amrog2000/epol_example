@@ -9,6 +9,7 @@
 #include "sys/resource.h"
 
 #include "EPollServer.h"
+#include "Cuserdb.h"
 #include "ComLog.h"
 
  

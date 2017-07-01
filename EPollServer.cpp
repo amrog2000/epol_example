@@ -89,7 +89,14 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
     
     m_TaskQue.writehead 	= nullptr;
     m_TaskQue.readtail 		= nullptr;
-
+    
+    m_pCuserDB = nullptr;
+    
+    m_pCuserDB = new CuserDB(m_szUserFileName);
+    if (!m_pCuserDB) {
+     // ::TODO   log error 
+    }
+    
 }
 //********************************************************************************************//
 CEpollServer::~CEpollServer()
@@ -127,44 +134,23 @@ CEpollServer::~CEpollServer()
     if (m_arrThreadInfo)
         delete [] m_arrThreadInfo;
 
+    if (m_pCuserDB){
+     delete (m_pCuserDB); 
+    }
 
     CComLog::instance().log("Destruction Completed", CComLog::Info);
-}
-
-//********************************************************************************************//
-CEpollServer::CEpollServer(char *szFileName) //Constructor for adding user names
-{
-  
-  strcpy( m_szUserFileName, szFileName);
-  
-}
-//********************************************************************************************//
-int CEpollServer::AddUser(char* szUserName, char* szPassword)
-{
-
-  m_strLogMsg = "User: " + string(szUserName) + " Added ";
-  
-  CComLog::instance().log(m_strLogMsg, CComLog::Info);
-  return true;
 }
 //********************************************************************************************//
 bool CEpollServer::AuthenticateUser(char* szUserName, char* szPassword)
 {
+  int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
   
-  return true;
-}
-//********************************************************************************************//
-int CEpollServer::LoadUserFile()
-{
+  if (iRet == VALID_USER)
+    return true;
+  else
+    return false;
+
   
-
-  return true;
-}
-//********************************************************************************************//
-int CEpollServer::SaveUserFile()
-{
-
-  return true;
 }
 //********************************************************************************************//
 void CEpollServer::setnonblocking(int iSocket)
