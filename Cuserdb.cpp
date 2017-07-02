@@ -193,19 +193,14 @@ int CuserDB::ListDB()
     int iWrite = 0;
 
     for (m_itUserMap = m_UserMap.begin(); m_itUserMap != m_UserMap.end(); ++m_itUserMap) {
-        cout <<  m_itUserMap->second.szUserName;
-        cout <<  m_itUserMap->second.szPassword;
-        cout <<  m_itUserMap->second.iGroupID;
-        cout <<  m_itUserMap->second.iAccessLevel;
-        cout <<  m_itUserMap->second.bActive;
-        cout <<  m_itUserMap->second.szPassword;
-        cout <<  m_itUserMap->second.szLastLoginTime;
-        cout <<  m_itUserMap->second.szLastLogoutTime;
-        cout <<  m_itUserMap->second.szLastMessage;
-        cout <<  m_itUserMap->second.szPassword;
-        cout <<  m_itUserMap->second.szDateAccountCreated;
-        cout <<  m_itUserMap->second.szDateAccountTerminated;
-        cout <<  m_itUserMap->second.szLastMessage;
+        cout <<  "Usename: " << m_itUserMap->second.szUserName << endl;
+        cout <<  "Password: " << m_itUserMap->second.szPassword << endl;
+        cout <<  "Group ID: " << m_itUserMap->second.iGroupID << endl;
+        cout <<  "Access Level: " << m_itUserMap->second.iAccessLevel << endl;
+        cout <<  "Active: " << m_itUserMap->second.bActive << endl;
+        cout <<  "Last Login Time: " << m_itUserMap->second.szLastLoginTime << endl;
+        cout <<  "Last Logout: " << m_itUserMap->second.szLastLogoutTime << endl;
+        cout <<  "Last Message: " << m_itUserMap->second.szLastMessage << endl;
 	
 	iWrite++;
 	cout<< "===============================================================================" << endl;

@@ -3,6 +3,9 @@
 
 #include "ComLog.h"
 #include "EPollServer.h"
+#include <iostream>
+
+using namespace std;
 
 #define	    SIZE_NAME  15
 
@@ -29,8 +32,6 @@ int main(int argc,char* argv[])
     CComLog::instance().log("Starting EPOll Server", CComLog::Info);
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
 
-
-
     if (argc > 0) { // Look for 'U' for DB
 
       cout << "Running in user Database mode" << endl;;
@@ -46,11 +47,12 @@ int main(int argc,char* argv[])
         if (!strncmp(argv[1], "U", 1)) {  // 'U' in upper case
             CComLog::instance().log("Starting Server for User Database Management", CComLog::Info);
 
-            cout << "Enter A  <username> <password>  <group ID>  <acess level>  /* to add a record */ " << endl;
-            cout << "Enter M  <username> <active /*1 or 0 */>  <iGroupID>  <Access Level >   /* to Modify user */ " << endl;
-            cout << "Enter C  <username> <new password>    /* to Change password */ " << endl;	    
-            cout << "Enter D  <username>   		   /* to Delete a record */ " << endl;
-            cout << "Enter L              		   /* to List records int the DB */ " << endl;
+            cout << "1  Add <username> <password>  <group ID>  <acess level> " << endl;
+            cout << "2  Modify <username> <active>  <iGroupID>  <Access Level > " << endl;
+            cout << "3  Change password <username> <new password>  " << endl;	    
+            cout << "4  Delete <username> " << endl;
+            cout << "5  List DB " << endl;
+	    cout << "0  Quit  " << endl;
 	    cout << endl;
 
             char szUserName[SIZE_NAME];
@@ -60,64 +62,84 @@ int main(int argc,char* argv[])
 
 	    int iRet;
 	    
-            int iSelection = 'x';
-            while (iSelection != 'q') {
-	      	cout << "Enter Selection:" << endl;
-                cin >> iSelection ;
-		cout << iSelection << endl;
+            int iSelection = 5;
+            while (iSelection != 0) {
+	      	cout << "Enter Selection:" ;
+		cin.clear();
+                cin >> iSelection;
+		cout << iSelection  << endl;
 		
                 switch (iSelection) {
-                case 'A':
+                case 1:
+		    cout << "Add User" << endl;		  
+		    cout << "Enter UserName  Password  GroupID  iAccessLevel" << endl;
                     cin >> szUserName >> szPassword >> iGroupID >> iAccessLevel;
+		    
                    iRet =  pCuserDB->AddUser(szUserName, szPassword, iGroupID, iAccessLevel);
 		   if (iRet == USER_ALREADY_EXIST)
 		     cout << "User Already Exist" << endl;
 		   else
-		      cout << "User Added ";
+		      cout << "User Added "  << endl;;
                     break;
 
-                case 'C':
+                case 2:
+		    cout << "Change User Passwordr" << endl;		  
+		    cout << "Enter UserName  Password " << endl;
+		  
                     cin >> szUserName >> szPassword ;
+//		    cout << "Enter UserName  Password " << endl;
                     iRet = pCuserDB->ChangeUserPassword(szUserName, szPassword);
 		    if(iRet == INVALID_USER_NAME)
 		      cout << "Invalid Username" << endl;
 		    else
-		      cout << "Password changed ";
+		      cout << "Password changed "  << endl;;
                     break;
 		    
-                case 'M':
-                    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
+                case 3:
+		    cout << "Modify User" << endl;		  
+		    cout << "Enter UserName  Active (0/1)  Group ID  Access Level " << endl;
+
+		    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
                     pCuserDB->ModifyUser(szUserName, bActive, iGroupID, iAccessLevel);
                     break;
             
-                case 'D':
-                    cin >> szUserName >> szPassword ;
+                case 4:
+		    cout << "Delete User" << endl;		  
+		    cout << "Enter UserName" << endl;
+		  
+                    cin >> szUserName;
                     iRet = pCuserDB->DeleteUser(szUserName);
 		    if (iRet == INVALID_USER_NAME)
-			cout << "Invalid User name" <<endl;
+			cout << "Invalid User name" << endl;
 		    else
-			cout << "User Deleted " <<endl;		      
+			cout << "User Deleted " << endl;		      
                     break;
 
-                case 'L':
+                case 5:
+		    cout << "List Users" << endl << endl;		  		  
                     pCuserDB->ListDB();
                     break;
 
                 default:
+		  continue;
                     break;
 
                 } // switch
-                if (iSelection == 'q') {
+                if (iSelection == 0) {
 		    pCuserDB->SaveUserFile();
                     delete pCuserDB;
 		    
 		    cout << " Successfull Termination";
 		    exit(EXIT_SUCCESS);
-                    break;
-                } // if (iSelection == 'q') 
-            }//      while (iSelection != 'q')
+                    break; // unreachable code
+                } // if (iSelection == 0) 
+            }//      while (iSelection != 0)
         }//if (!strncmp(argv[1], "U", 1)) {  // 'U' in upper case
-    }  //    if (argc > 0)  // Look for 'C' for Client  or else for Server
+        if (pCuserDB){
+	   delete pCuserDB;
+	   exit(EXIT_SUCCESS);
+	}
+    }  //    if (argc > 0)  // Look for "U" for user db mode
 
     CEpollServer* pCEpoll = nullptr;
     pCEpoll = new CEpollServer(SEpoll_Ctor);
