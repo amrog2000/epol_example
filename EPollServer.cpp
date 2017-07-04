@@ -147,8 +147,8 @@ bool CEpollServer::AuthenticateUser(char* szUserName, char* szPassword)
   
   if (iRet == VALID_USER)
     return true;
-  else
-    return false;
+  
+  return false;
 
   
 }
