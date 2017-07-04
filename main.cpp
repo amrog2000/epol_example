@@ -64,7 +64,8 @@ int main(int argc,char* argv[])
 	    
             int iSelection = 5;
             while (iSelection != 0) {
-	      	cout << "Enter Selection:" ;
+	      cout << endl;	
+	      cout << "Enter Selection:" ;
 		cin.clear();
                 cin >> iSelection;
 		cout << iSelection  << endl;
@@ -77,9 +78,9 @@ int main(int argc,char* argv[])
 		    
                    iRet =  pCuserDB->AddUser(szUserName, szPassword, iGroupID, iAccessLevel);
 		   if (iRet == USER_ALREADY_EXIST)
-		     cout << "User Already Exist" << endl;
+		     cout << "User Already Exist" << endl  << endl;
 		   else
-		      cout << "User Added "  << endl;;
+		      cout << "User Added "  << endl  << endl;
                     break;
 
                 case 2:
@@ -90,9 +91,9 @@ int main(int argc,char* argv[])
 //		    cout << "Enter UserName  Password " << endl;
                     iRet = pCuserDB->ChangeUserPassword(szUserName, szPassword);
 		    if(iRet == INVALID_USER_NAME)
-		      cout << "Invalid Username" << endl;
+		      cout << "Invalid Username" << endl<< endl;
 		    else
-		      cout << "Password changed "  << endl;;
+		      cout << "Password changed "  << endl << endl;
                     break;
 		    
                 case 3:
@@ -110,9 +111,9 @@ int main(int argc,char* argv[])
                     cin >> szUserName;
                     iRet = pCuserDB->DeleteUser(szUserName);
 		    if (iRet == INVALID_USER_NAME)
-			cout << "Invalid User name" << endl;
+			cout << "Invalid User name" <<  endl << endl;
 		    else
-			cout << "User Deleted " << endl;		      
+			cout << "User Deleted " << endl << endl;		      
                     break;
 
                 case 5:
