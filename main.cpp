@@ -15,18 +15,17 @@ int main(int argc,char* argv[])
     // nfds is number of events (number of returned fd)
 
     EPOLL_CTOR_LIST SEpoll_Ctor;
-    /*  initialize the structure here to construct the server
-    SEpoll_Ctor.iLoadFactor =
-    SEpoll_Ctor.nReadThreads
-    SEpoll_Ctor.nWriteThreads
-    SEpoll_Ctor.nWriteThreads
-    SEpoll_Ctor.iNumOFileDescriptors
-    SEpoll_Ctor.szServerPort
-    SEpoll_Ctor.iTimeOut
-    SEpoll_Ctor.Local_addr
-    SEpoll_Ctor.MaxByte
-    SEpoll_Ctor.Open_Max
-    */
+    //  initialize the structure here to construct the server
+    SEpoll_Ctor.iLoadFactor =  10;
+    SEpoll_Ctor.nReadThreads = 5;
+    SEpoll_Ctor.nWriteThreads = 5;
+    SEpoll_Ctor.iNumOFileDescriptors = 1000;
+    strcpy(SEpoll_Ctor.szServerPort, "9998");
+    SEpoll_Ctor.iTimeOut = 1000;
+//    SEpoll_Ctor.Local_addr = 127.0.0.1;
+    SEpoll_Ctor.MaxByte = 1000;
+    SEpoll_Ctor.Open_Max = 1000;
+    //
 
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
     CComLog::instance().log("Starting EPOll Server", CComLog::Info);

@@ -43,7 +43,7 @@
 #define INFTIM      1000
 #define LOCAL_ADDR  "127.0.0.1"
 
-#define   SERVER_PORT_SIZE 10
+#define   SERVER_PORT_SIZE 15
 // #define TIMEOUT     500
 
 using namespace std;
