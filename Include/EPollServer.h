@@ -29,8 +29,14 @@
 #include "Cuserdb.h"
 
 // maximum received data byte
-#define MAXBTYE     10
+#define MAXBTYE     100
 #define OPEN_MAX    100
+
+#define SIZE_OF_LOGIN_MESSAGE  25+1
+#define SIZE_OF_USERNAME       11+1
+#define SIZE_OF_PASSWORD      11+1
+
+
 //#define LISTENQ     20  >> Changed to MaxEvents
 
 #define SERV_PORT   10012
@@ -175,7 +181,7 @@ private:  // yes yes it is by default
 
     char  m_szUserFileName[MAX_PATH];
     CuserDB* m_pCuserDB;
-    bool AuthenticateUser(char* szUserName, char* szPassword);
+    int AuthenticateUser(char* szRecvBuffer);
 
 public:
     int  PrepListener();

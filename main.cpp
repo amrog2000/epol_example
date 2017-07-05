@@ -84,6 +84,14 @@ int main(int argc,char* argv[])
                     break;
 
                 case 2:
+		    cout << "Modify User" << endl;		  
+		    cout << "Enter UserName  Active (0/1)  Group ID  Access Level " << endl;
+
+		    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
+                    pCuserDB->ModifyUser(szUserName, bActive, iGroupID, iAccessLevel);
+                    break;
+		    
+                case 3:
 		    cout << "Change User Passwordr" << endl;		  
 		    cout << "Enter UserName  Password " << endl;
 		  
@@ -96,13 +104,6 @@ int main(int argc,char* argv[])
 		      cout << "Password changed "  << endl << endl;
                     break;
 		    
-                case 3:
-		    cout << "Modify User" << endl;		  
-		    cout << "Enter UserName  Active (0/1)  Group ID  Access Level " << endl;
-
-		    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
-                    pCuserDB->ModifyUser(szUserName, bActive, iGroupID, iAccessLevel);
-                    break;
             
                 case 4:
 		    cout << "Delete User" << endl;		  

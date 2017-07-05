@@ -141,14 +141,32 @@ CEpollServer::~CEpollServer()
     CComLog::instance().log("Destruction Completed", CComLog::Info);
 }
 //********************************************************************************************//
-bool CEpollServer::AuthenticateUser(char* szUserName, char* szPassword)
+int CEpollServer::AuthenticateUser(char* szRecvBuffer)
 {
-  int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
-  
-  if (iRet == VALID_USER)
-    return true;
-  
-  return false;
+   if (strlen(szRecvBuffer) < SIZE_OF_LOGIN_MESSAGE){
+     return INVALID_LOGIN_MESSAGE;
+   }
+   
+   char szUserName[SIZE_OF_USERNAME];
+   char szPassword[SIZE_OF_PASSWORD];
+/*
+   char cMsgType;
+   memmove(&cMsgType, szRecvBuffer, 1 );
+   */
+   if (*szRecvBuffer != 'L'){
+     return INVALID_LOGIN_MESSAGE;
+   }
+   
+   memset(szUserName, '\0', SIZE_OF_USERNAME);
+   memset(szPassword,  '\0', SIZE_OF_PASSWORD);
+   
+   memmove(szUserName, szRecvBuffer+2 , 11 );
+   memmove(szPassword, szRecvBuffer +14, 11);
+   
+   
+   int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
+   
+   return iRet;
 
   
 }
@@ -294,7 +312,34 @@ int CEpollServer::ProcessEpoll()
                         break;
                     }
                 } // if (connfd == -1) {
+                char szInBuffer[MAXBTYE ];
+		int nRecv;
+		string strMsg ;
+                if (( nRecv = recv(m_Socket, szInBuffer, MAXBTYE, 0)) > 0) {		
+		  nRecv = AuthenticateUser( szInBuffer);
+		  if (nRecv != VALID_USER) {
+		    strMsg.clear();
+		    strMsg = "Connection Accept Error, following message was received ";
+		    strMsg += szInBuffer;
+                    CComLog::instance().log(strMsg, CComLog::Error);		    
+		    strMsg.clear();
+		    strMsg = "R";  // response message
+		    strMsg += "R"; // rejection 
+		    strMsg += to_string(nRecv);
+		    send(m_Socket, strMsg.c_str(), 3, 0);
+		     continue;
+		  }
+		}
+		else{
+		  continue;
+		}
+		strMsg = "R";  // response message
+		strMsg += "A"; // accepted
+		strMsg += to_string(nRecv);
+		send(m_Socket, strMsg.c_str(), 3, 0);
+		
 
+                
                 setnonblocking(connfd);
                 m_strLogMsg = "[SERVER] connect from";
                 m_strLogMsg += inet_ntoa(clientaddr.sin_addr);
