@@ -29,7 +29,7 @@
 #include "Cuserdb.h"
 
 // maximum received data byte
-#define MAXBTYE     100
+#define MAXBYTE     100
 #define OPEN_MAX    100
 
 #define SIZE_OF_LOGIN_MESSAGE  25+1
@@ -81,7 +81,7 @@ struct user_data {
     // real received data size
     unsigned int n_size;
     // content received
-    char line[MAXBTYE];
+    char line[MAXBYTE];
 };
 
 typedef struct CEpollServerCtorList {
@@ -181,11 +181,13 @@ private:  // yes yes it is by default
 
     char  m_szUserFileName[MAX_PATH];
     CuserDB* m_pCuserDB;
-    int AuthenticateUser(char* szRecvBuffer);
+//    int AuthenticateUser(char* szRecvBuffer);
+    void RemoveBlanks(char* szString);
 
 public:
     int  PrepListener();
-
+    int AuthenticateUser(char* szRecvBuffer);
+    
     int GetErrorCode();
     int ProcessEpoll();
     int TerminateThreads();

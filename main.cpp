@@ -6,7 +6,7 @@
 #include <iostream>
 
 using namespace std;
-
+// U  UserDB.qtx
 #define	    SIZE_NAME  15
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,6 +24,7 @@ int main(int argc,char* argv[])
     SEpoll_Ctor.iTimeOut = 1000;
 //    SEpoll_Ctor.Local_addr = 127.0.0.1;
     SEpoll_Ctor.MaxByte = 1000;
+    SEpoll_Ctor.MaxEvents = 1000;
     SEpoll_Ctor.Open_Max = 1000;
     //
 
@@ -31,7 +32,7 @@ int main(int argc,char* argv[])
     CComLog::instance().log("Starting EPOll Server", CComLog::Info);
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
 
-    if (argc > 0) { // Look for 'U' for DB
+    if (argc > 1) { // Look for 'U' for DB
 
       cout << "Running in user Database mode" << endl;;
       cout << "User Filename: " << argv[2];
@@ -57,6 +58,10 @@ int main(int argc,char* argv[])
             char szUserName[SIZE_NAME];
             char szPassword[SIZE_NAME];
 	    
+
+            memset( szUserName, '\0', SIZE_NAME); 
+            memset( szPassword, '\0', SIZE_NAME); 
+
 	    int bActive, iGroupID, iAccessLevel;
 
 	    int iRet;
@@ -162,6 +167,9 @@ int main(int argc,char* argv[])
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
+    
+//    pCEpoll->AuthenticateUser("L Amro        Amro        "); for test purposes only
+    
 
     pCEpoll->ProcessEpoll();   // main driver loop here
     if (pCEpoll->GetErrorCode() > 100)

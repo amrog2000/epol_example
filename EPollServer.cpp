@@ -43,8 +43,8 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
 
     int ii = 0;
     for (ii = 0; ii < m_CtorList.nReadThreads; ii++) {
-        pthread_mutex_init(&pR_Mutex[i], nullptr);
-        pthread_cond_init(&pR_Condl[i], nullptr);
+        pthread_mutex_init(&pR_Mutex[ii], nullptr);
+        pthread_cond_init(&pR_Condl[ii], nullptr);
 
         m_arrThreadInfo[ii].eState = TS_INACTIVE;
 
@@ -53,8 +53,8 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
     }
 
     for (ii = m_CtorList.nReadThreads ; ii < (m_CtorList.nReadThreads + m_CtorList.nWriteThreads); ii++) {
-        pthread_mutex_init(&pW_Mutex[i], nullptr);
-        pthread_cond_init(&pW_Condl[i], nullptr);
+        pthread_mutex_init(&pW_Mutex[ii], nullptr);
+        pthread_cond_init(&pW_Condl[ii], nullptr);
 
         m_arrThreadInfo[ii].eState = TS_INACTIVE;
 
@@ -149,10 +149,7 @@ int CEpollServer::AuthenticateUser(char* szRecvBuffer)
    
    char szUserName[SIZE_OF_USERNAME];
    char szPassword[SIZE_OF_PASSWORD];
-/*
-   char cMsgType;
-   memmove(&cMsgType, szRecvBuffer, 1 );
-   */
+
    if (*szRecvBuffer != 'L'){
      return INVALID_LOGIN_MESSAGE;
    }
@@ -161,13 +158,30 @@ int CEpollServer::AuthenticateUser(char* szRecvBuffer)
    memset(szPassword,  '\0', SIZE_OF_PASSWORD);
    
    memmove(szUserName, szRecvBuffer+2 , 11 );
-   memmove(szPassword, szRecvBuffer +14, 11);
+   RemoveBlanks(szUserName);
    
+   memmove(szPassword, szRecvBuffer+14, 11);
+   RemoveBlanks(szPassword);
    
    int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
    
    return iRet;
-
+}
+//********************************************************************************************//
+void CEpollServer::RemoveBlanks(char* szString)
+{
+  char* ptr;
+  
+  int ilen = strlen(szString);
+  
+  ptr = szString + strlen(szString)-1 ;
+  
+//  while (*ptr ==  '0x20')   // Does NOT work!!!
+    while (*ptr ==  ' '){
+    ptr--;
+  }
+  
+  *(++ptr) = '\0';
   
 }
 //********************************************************************************************//
@@ -206,11 +220,11 @@ int CEpollServer::PrepListener()
     struct addrinfo hints;
     struct addrinfo *result;
     struct addrinfo *rp;
-    int s, sfd;
+    int s;
 
     memset (&hints, 0, sizeof (struct addrinfo));
-    hints.ai_family = AF_UNSPEC;     /* Return IPv4 and IPv6 choices */
-    hints.ai_socktype = SOCK_STREAM; /* We want a TCP socket */
+    hints.ai_family = AF_UNSPEC;     /*  IPv4 and IPv6 choices */
+    hints.ai_socktype = SOCK_STREAM; /*  TCP socket */
     hints.ai_flags = AI_PASSIVE| AI_V4MAPPED;     /* All interfaces */
 
     s = getaddrinfo (nullptr, m_szServerPort, &hints, &result);
@@ -226,15 +240,14 @@ int CEpollServer::PrepListener()
     for (rp = result; rp != nullptr; rp = rp->ai_next)
     {
         m_Socket = socket (rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-        if (sfd == -1)
+        if (m_Socket == -1)
             continue;
 
         s = bind (m_Socket, rp->ai_addr, rp->ai_addrlen);
         if (s == 0) {  // succefull bind
             break;
         }
-
-        close (sfd);
+        close (m_Socket);
     }
 
     if (rp == nullptr)
@@ -249,14 +262,14 @@ int CEpollServer::PrepListener()
 
     if (s == -1)
     {
-        m_iError = 5210;  // enum all the errors
+        m_iError = 520;  // enum all the errors
         return -1;
     }
 
     m_ev.data.fd = m_Socket;
     m_ev.events = EPOLLIN | EPOLLET;
 
-    s = epoll_ctl (m_efd, EPOLL_CTL_ADD, sfd, &m_ev);
+    s = epoll_ctl (m_efd, EPOLL_CTL_ADD, m_Socket, &m_ev);
 
     if (s == -1)
     {
@@ -264,10 +277,8 @@ int CEpollServer::PrepListener()
         abort ();
     }
 
-
-    return sfd;
+    return m_Socket;  // an non zero int
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 int CEpollServer::GetErrorCode()
 {
@@ -286,7 +297,11 @@ int CEpollServer::ProcessEpoll()
     int iRet = 0;
 
     int iRetry = 0;
+    
+    char szInBuffer[MAXBYTE ];
+    memset(szInBuffer, '\0', MAXBYTE) ;
 
+    CComLog::instance().log("Entering epoll loop waiting for connections", CComLog::Error);
     for(;;)
     {
         // waiting for epoll event
@@ -312,10 +327,12 @@ int CEpollServer::ProcessEpoll()
                         break;
                     }
                 } // if (connfd == -1) {
-                char szInBuffer[MAXBTYE ];
+                
+		
 		int nRecv;
 		string strMsg ;
-                if (( nRecv = recv(m_Socket, szInBuffer, MAXBTYE, 0)) > 0) {		
+//                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, MSG_WAITALL)) > 0) {				
+                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, 0)) > 0) {				
 		  nRecv = AuthenticateUser( szInBuffer);
 		  if (nRecv != VALID_USER) {
 		    strMsg.clear();
@@ -326,21 +343,40 @@ int CEpollServer::ProcessEpoll()
 		    strMsg = "R";  // response message
 		    strMsg += "R"; // rejection 
 		    strMsg += to_string(nRecv);
-		    send(m_Socket, strMsg.c_str(), 3, 0);
+		    send(connfd, strMsg.c_str(), 3, 0);
+		    close(connfd);
 		     continue;
 		  }
 		}
 		else{
+		  switch (errno ){
+		    case EAGAIN:
+		      break;
+		    case EBADF:
+		      break;
+		  case ECONNREFUSED:
+		      break;	
+		    case EFAULT:
+		      break;
+		  case EINTR:
+		      break;		      
+		    case EINVAL:
+		      break;
+		  case ENOMEM:
+		      break;	
+		  case ENOTCONN:
+		      break;		      
+		    case ENOTSOCK:
+		      break;
+                    }		  
 		  continue;
 		}
 		strMsg = "R";  // response message
 		strMsg += "A"; // accepted
 		strMsg += to_string(nRecv);
-		send(m_Socket, strMsg.c_str(), 3, 0);
-		
+		send(connfd, strMsg.c_str(), 3, 0);
 
-                
-                setnonblocking(connfd);
+		setnonblocking(connfd);
                 m_strLogMsg = "[SERVER] connect from";
                 m_strLogMsg += inet_ntoa(clientaddr.sin_addr);
                 CComLog::instance().log(m_strLogMsg, CComLog::Debug);
@@ -377,7 +413,7 @@ int CEpollServer::ProcessEpoll()
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin before lock\n", pthread_self());
                 // protect task queue (readhead/readtail)
 
-		if (m_iReadMutexIndex++ > m_CtorList.nReadThreads)
+		if (m_iReadMutexIndex++ > m_CtorList.nReadThreads) 
                     m_iReadMutexIndex = 0;
 		
                 pthread_mutex_lock(&pR_Mutex[m_iReadMutexIndex]);
@@ -452,13 +488,14 @@ int CEpollServer::ProcessEpoll()
             }
         }
     }
+    CComLog::instance().log("Exited from epoll loop ", CComLog::Error);
 
     return 0;
 }
 //********************************************************************************************//
 void *CEpollServer::readtask(void *args)
 {
-    int iThreadIndex = *((int*) &args);
+    int iThreadIndex = *((int*) args);
 
     int fd = -1;
     int n, i;
@@ -496,7 +533,7 @@ void *CEpollServer::readtask(void *args)
         data =  new (user_data);
 
         data->fd = fd;
-        if ((n = recv(fd, data->line, MAXBTYE, 0)) < 0) {
+        if ((n = recv(fd, data->line, MAXBYTE, 0)) < 0) {
             if (errno == ECONNRESET)
                 close(fd);
             m_strLogMsg = "[SERVER] Error: readline failed: " ;
@@ -544,7 +581,7 @@ void *CEpollServer::readtask(void *args)
 void *CEpollServer::writetask(void *args)
 {
 
-    int iThreadIndex = *((int*) &args);
+    int iThreadIndex = *((int*) args);
     unsigned int n;
     // data to wirte back to client
     struct user_data *rdata = nullptr;

@@ -68,7 +68,7 @@ int CuserDB::VerifyUser(char* szUsername, char* szPassword)
      return INVALID_PASSWORD;
    }
    
-   if (UserRecord.bActive) {
+   if (!UserRecord.bActive) {
      return USER_INACTIVE;
    }
    
