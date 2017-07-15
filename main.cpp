@@ -32,7 +32,7 @@ int main(int argc,char* argv[])
     CComLog::instance().log("Starting EPOll Server", CComLog::Info);
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
 
-    if (argc > 1) { // Look for 'U' for DB
+    if (argc == 3) { // Look for 'U' for DB          //  <U  UserDB.qtx>  for example
 
       cout << "Running in user Database mode" << endl;;
       cout << "User Filename: " << argv[2];
@@ -46,7 +46,7 @@ int main(int argc,char* argv[])
 
         if (!strncmp(argv[1], "U", 1)) {  // 'U' in upper case
             CComLog::instance().log("Starting Server for User Database Management", CComLog::Info);
-
+	    cout << endl;
             cout << "1  Add <username> <password>  <group ID>  <acess level> " << endl;
             cout << "2  Modify <username> <active>  <iGroupID>  <Access Level > " << endl;
             cout << "3  Change password <username> <new password>  " << endl;	    
@@ -57,14 +57,13 @@ int main(int argc,char* argv[])
 
             char szUserName[SIZE_NAME];
             char szPassword[SIZE_NAME];
-	    
 
             memset( szUserName, '\0', SIZE_NAME); 
             memset( szPassword, '\0', SIZE_NAME); 
 
-	    int bActive, iGroupID, iAccessLevel;
+	    int bActive = 0, iGroupID = 0, iAccessLevel = 0;
 
-	    int iRet;
+	    int iRet = 0;
 	    
             int iSelection = 5;
             while (iSelection != 0) {
@@ -145,44 +144,51 @@ int main(int argc,char* argv[])
 	   delete pCuserDB;
 	   exit(EXIT_SUCCESS);
 	}
-    }  //    if (argc > 0)  // Look for "U" for user db mode
+    }  //    if (argc == 3 0)  // Look for "U" for user db mode
 
+    // argc == 2           //   <./QuantCom UserDB.qtx>  for example
+    if (!argv[1] ) {
+      // ::TODO error message
+	exit(EXIT_FAILURE);      
+    }
+    
+    strcpy(SEpoll_Ctor.szUserFileName, argv[1]);
+    
     CEpollServer* pCEpoll = nullptr;
     pCEpoll = new CEpollServer(SEpoll_Ctor);
 
-    if (!pCEpoll)
-        exit(EXIT_FAILURE);
+    if (!pCEpoll){
+      CComLog::instance().log("Failure Getting an instance of EPOll Server", CComLog::Error);
+      exit(EXIT_FAILURE);
+    }
 
-    if (pCEpoll->GetErrorCode() > 100)
+    if (pCEpoll->GetError() > 100)
     {
-        CComLog::instance().log("Failure Getting an instance of EPOll Server", CComLog::Error);
+        CComLog::instance().log("Error instanializing EPOll Server", CComLog::Error);
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
 
     pCEpoll->PrepListener();
-    if (pCEpoll->GetErrorCode() > 100)
+    if (pCEpoll->GetError() > 100)
     {
         CComLog::instance().log("Failure to Listen EPOll Server", CComLog::Error);
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
-    
 //    pCEpoll->AuthenticateUser("L Amro        Amro        "); for test purposes only
-    
-
     pCEpoll->ProcessEpoll();   // main driver loop here
-    if (pCEpoll->GetErrorCode() > 100)
+    if (pCEpoll->GetError() > 100)
     {
         CComLog::instance().log("Failure to Process EPOll Server", CComLog::Error);
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
 
-    TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();
+    TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();  // Monitor 
 // output TQueue
 
-    pCEpoll->TerminateThreads();
+//     pCEpoll->TerminateThreads();  // Called by the destructor
 
     delete pCEpoll;
 

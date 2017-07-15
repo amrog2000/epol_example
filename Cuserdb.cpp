@@ -5,21 +5,22 @@
 CuserDB::CuserDB(char* szUserFileName)
 {
 
+    m_iError = VALID_USER_FILE_NAME;
+    
     struct stat st = {0};
 
     if (stat("../Users/", &st) == -1) {
         mkdir("../Users/", 0700);
     }
 
-
     string strUserDBFile;
     strUserDBFile.clear();
 
     strUserDBFile = "../Users/";
-    strUserDBFile += "szUserFileName";
+    strUserDBFile += szUserFileName;
 
     m_ifd = open(strUserDBFile.c_str(), O_CREAT|O_RDWR|O_APPEND, S_IRWXU);
-
+    
     USER_RECORD UserRecord = {0};
 
     m_iSizeOfUserRecord = sizeof (USER_RECORD);
@@ -28,6 +29,8 @@ CuserDB::CuserDB(char* szUserFileName)
     if (m_ifd == -1) {
         CComLog::instance().log("Open User DB File...Error Opening File: ", CComLog::Error);
         CComLog::instance().log(strUserDBFile, CComLog::Error);
+	m_iError = INVALID_USER_FILE_NAME;
+	
         // Set error code and exit
     }
     else {// load users in Map
@@ -43,6 +46,13 @@ CuserDB::CuserDB(char* szUserFileName)
         strMsg = "Inserted: " + to_string(nCount) + " User Records";
         CComLog::instance().log(strMsg, CComLog::Info);
     } // else
+ 
+}
+//********************************************************************************************//
+int CuserDB::GetError()
+{
+  return m_iError;
+ 
 }
 //********************************************************************************************//
 CuserDB::~CuserDB()

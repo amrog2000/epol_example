@@ -64,44 +64,54 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
 
     m_efd = epoll_create(m_MaxEvents);
     eventList = nullptr;
-    
+
     eventList = new epoll_event[m_MaxEvents];
     if (!eventList) {
-      m_iError = 1000;
-      
-     // ::TODO log error 
+        m_iError = 1000;
+
+        // ::TODO log error
     }
-    
+
     memset(m_szUserFileName, '\0', MAX_PATH);
     strcpy(m_szUserFileName, m_CtorList.szUserFileName);
 
     m_iReadMutexIndex 		= 0;
     m_iWriteMutexIndex  	= 0;
-    
+
     m_TaskQue.readhead 		= nullptr;
     m_TaskQue.readtail 		= nullptr;
-    
+
     m_TaskQue.uiReadTasksInQ  	= 0;
     m_TaskQue.uiWriteTasksInQ 	= 0;
-    
+
     m_TaskQue.uiTotalWriteTasks = 0;
     m_TaskQue.uiTotalReadTasks  = 0;
-    
+
     m_TaskQue.writehead 	= nullptr;
     m_TaskQue.readtail 		= nullptr;
-    
+
     m_pCuserDB = nullptr;
-    
+
     m_pCuserDB = new CuserDB(m_szUserFileName);
     if (!m_pCuserDB) {
-     // ::TODO   log error 
+        m_iError = 700;  // ENUM LATER
     }
-    
+
+    if (m_pCuserDB->GetError() == INVALID_USER_FILE_NAME) {
+        m_iError = INVALID_USER_FILE_NAME;
+        m_iError = 1001;  // ENUM LATER
+    }
+    m_bTerminate = false;
 }
 //********************************************************************************************//
 CEpollServer::~CEpollServer()
 {
-// Terminate all threads
+
+    // Terminate all threads
+  m_bTerminate = true;
+
+    CComLog::instance().log("Terminating Threads", CComLog::Info);
+    TerminateThreads();
 
     CComLog::instance().log("Closing File descriptors", CComLog::Info);
 
@@ -119,12 +129,14 @@ CEpollServer::~CEpollServer()
         delete []  pW_Thread ;
 
     CComLog::instance().log("Deleting Mutex Array", CComLog::Info);
+
     if (pR_Mutex)
         delete []  pR_Mutex ;
     if (pW_Mutex)
         delete []  pW_Mutex ;
 
     CComLog::instance().log("Deleting Conditional Variables Array", CComLog::Info);
+
     if (pR_Condl)
         delete []  pR_Condl ;
     if (pW_Condl)
@@ -134,8 +146,8 @@ CEpollServer::~CEpollServer()
     if (m_arrThreadInfo)
         delete [] m_arrThreadInfo;
 
-    if (m_pCuserDB){
-     delete (m_pCuserDB); 
+    if (m_pCuserDB) {
+        delete (m_pCuserDB);
     }
 
     CComLog::instance().log("Destruction Completed", CComLog::Info);
@@ -143,46 +155,46 @@ CEpollServer::~CEpollServer()
 //********************************************************************************************//
 int CEpollServer::AuthenticateUser(char* szRecvBuffer)
 {
-   if (strlen(szRecvBuffer) < SIZE_OF_LOGIN_MESSAGE){
-     return INVALID_LOGIN_MESSAGE;
-   }
-   
-   char szUserName[SIZE_OF_USERNAME];
-   char szPassword[SIZE_OF_PASSWORD];
+    if (strlen(szRecvBuffer) < SIZE_OF_LOGIN_MESSAGE) {
+        return INVALID_LOGIN_MESSAGE;
+    }
 
-   if (*szRecvBuffer != 'L'){
-     return INVALID_LOGIN_MESSAGE;
-   }
-   
-   memset(szUserName, '\0', SIZE_OF_USERNAME);
-   memset(szPassword,  '\0', SIZE_OF_PASSWORD);
-   
-   memmove(szUserName, szRecvBuffer+2 , 11 );
-   RemoveBlanks(szUserName);
-   
-   memmove(szPassword, szRecvBuffer+14, 11);
-   RemoveBlanks(szPassword);
-   
-   int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
-   
-   return iRet;
+    char szUserName[SIZE_OF_USERNAME];
+    char szPassword[SIZE_OF_PASSWORD];
+
+    if (*szRecvBuffer != 'L') {
+        return INVALID_LOGIN_MESSAGE;
+    }
+
+    memset(szUserName, '\0', SIZE_OF_USERNAME);
+    memset(szPassword,  '\0', SIZE_OF_PASSWORD);
+
+    memmove(szUserName, szRecvBuffer+2 , 11 );
+    RemoveBlanks(szUserName);
+
+    memmove(szPassword, szRecvBuffer+14, 11);
+    RemoveBlanks(szPassword);
+
+    int iRet = m_pCuserDB->VerifyUser(szUserName, szPassword);
+
+    return iRet;
 }
 //********************************************************************************************//
 void CEpollServer::RemoveBlanks(char* szString)
 {
-  char* ptr;
-  
-  int ilen = strlen(szString);
-  
-  ptr = szString + strlen(szString)-1 ;
-  
-//  while (*ptr ==  '0x20')   // Does NOT work!!!
-    while (*ptr ==  ' '){
-    ptr--;
-  }
-  
-  *(++ptr) = '\0';
-  
+    char* ptr;
+
+    int ilen = strlen(szString);
+
+    ptr = szString + strlen(szString)-1 ;
+
+  while (*ptr ==  0x20) {  //   '0x20'  Does NOT work!!!
+//    while (*ptr ==  ' ') {
+        ptr--;
+    }
+
+    *(++ptr) = '\0';
+
 }
 //********************************************************************************************//
 void CEpollServer::setnonblocking(int iSocket)
@@ -203,7 +215,7 @@ void CEpollServer::setnonblocking(int iSocket)
 
 
         iRet =   setsockopt(iSocket, SOL_SOCKET, SO_SNDBUF, &iSendBuffSize, sizeof iSendBuffSize);
-	// check for errors by getiSocketopt
+        // check for errors by getiSocketopt
         iRet =   setsockopt(iSocket, SOL_SOCKET, SO_RCVBUF, &iRecvBuffSize, sizeof iRecvBuffSize);
         // check for errors by getiSocketopt
     }
@@ -232,7 +244,7 @@ int CEpollServer::PrepListener()
     {
 //      fprintf (stderr, "getaddrinfo: %s\n", gai_strerror (s));
 
-        m_iError = 510;  // enum all the errors
+        m_iError = 510;  // ::TODO enum all the errors
         return -1;
 
     }
@@ -253,7 +265,7 @@ int CEpollServer::PrepListener()
     if (rp == nullptr)
     {
         fprintf (stderr, "Could not bind\n");
-        m_iError = 510;  // enum all the errors
+        m_iError = 510;  // ::TODO enum all the errors
         return -1;
     }
 
@@ -262,7 +274,7 @@ int CEpollServer::PrepListener()
 
     if (s == -1)
     {
-        m_iError = 520;  // enum all the errors
+        m_iError = 520;  // ::TODO enum all the errors
         return -1;
     }
 
@@ -280,10 +292,9 @@ int CEpollServer::PrepListener()
     return m_Socket;  // an non zero int
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-int CEpollServer::GetErrorCode()
+int CEpollServer::GetError()
 {
     return m_iError;
-
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 int CEpollServer::ProcessEpoll()
@@ -297,7 +308,7 @@ int CEpollServer::ProcessEpoll()
     int iRet = 0;
 
     int iRetry = 0;
-    
+
     char szInBuffer[MAXBYTE ];
     memset(szInBuffer, '\0', MAXBYTE) ;
 
@@ -306,6 +317,9 @@ int CEpollServer::ProcessEpoll()
     {
         // waiting for epoll event
         m_nfds = epoll_wait(m_efd, eventList, m_MaxEvents, m_iTimeOut);
+	if (m_bTerminate)
+	  break;
+	
         // In case of edge trigger, must go over each event
         for (i = 0; i < m_nfds; ++i)
         {
@@ -327,81 +341,75 @@ int CEpollServer::ProcessEpoll()
                         break;
                     }
                 } // if (connfd == -1) {
-                
-		
-		int nRecv;
-		string strMsg ;
-//                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, MSG_WAITALL)) > 0) {				
-                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, 0)) > 0) {				
-		  nRecv = AuthenticateUser( szInBuffer);
-		  if (nRecv != VALID_USER) {
-		    strMsg.clear();
-		    strMsg = "Connection Accept Error, following message was received ";
-		    strMsg += szInBuffer;
-                    CComLog::instance().log(strMsg, CComLog::Error);		    
-		    strMsg.clear();
-		    strMsg = "R";  // response message
-		    strMsg += "R"; // rejection 
-		    strMsg += to_string(nRecv);
-		    send(connfd, strMsg.c_str(), 3, 0);
-		    close(connfd);
-		     continue;
-		  }
-		}
-		else{
-		  switch (errno ){
-		    case EAGAIN:
-		      break;
-		    case EBADF:
-		      break;
-		  case ECONNREFUSED:
-		      break;	
-		    case EFAULT:
-		      break;
-		  case EINTR:
-		      break;		      
-		    case EINVAL:
-		      break;
-		  case ENOMEM:
-		      break;	
-		  case ENOTCONN:
-		      break;		      
-		    case ENOTSOCK:
-		      break;
-                    }		  
-		  continue;
-		}
-		strMsg = "R";  // response message
-		strMsg += "A"; // accepted
-		strMsg += to_string(nRecv);
-		send(connfd, strMsg.c_str(), 3, 0);
 
-		setnonblocking(connfd);
+
+                int nRecv;
+                string strMsg ;
+//                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, MSG_WAITALL)) > 0) {
+                if (( nRecv = recv(connfd, szInBuffer, MAXBYTE, 0)) > 0) {
+                    nRecv = AuthenticateUser( szInBuffer);
+                    if (nRecv != VALID_USER) {
+                        strMsg.clear();
+                        strMsg = "Connection Accept Error, following message was received ";
+                        strMsg += szInBuffer;
+                        CComLog::instance().log(strMsg, CComLog::Error);
+                        strMsg.clear();
+                        strMsg = "R";  // response message
+                        strMsg += "R"; // rejection
+                        strMsg += to_string(nRecv);
+                        send(connfd, strMsg.c_str(), 3, 0);
+                        close(connfd);
+                        continue;
+                    }
+                }
+                else {
+                    switch (errno ) {
+                    case EAGAIN:
+                        break;
+                    case EBADF:
+                        break;
+                    case ECONNREFUSED:
+                        break;
+                    case EFAULT:
+                        break;
+                    case EINTR:
+                        break;
+                    case EINVAL:
+                        break;
+                    case ENOMEM:
+                        break;
+                    case ENOTCONN:
+                        break;
+                    case ENOTSOCK:
+                        break;
+                    }
+                    continue;
+                }
+                strMsg = "R";  // response message
+                strMsg += "A"; // accepted
+                strMsg += to_string(nRecv);
+                send(connfd, strMsg.c_str(), 3, 0);
+
+                setnonblocking(connfd);
                 m_strLogMsg = "[SERVER] connect from";
                 m_strLogMsg += inet_ntoa(clientaddr.sin_addr);
                 CComLog::instance().log(m_strLogMsg, CComLog::Debug);
-//                CComLog::instance().log(m_strLogMsg);"[SERVER] connect from %s \n", inet_ntoa(clientaddr.sin_addr));
 
                 iRet = getnameinfo (&in_addr, in_len,  hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
                 if (iRet == 0) {
-                    m_strLogMsg = "Accepted connection on descriptor:  " +  to_string(connfd) + "Host: " + hbuf + "Port: " + sbuf  ;
+                    m_strLogMsg = "Accepted connection on descriptor:  " +  to_string(connfd) + "Host: " + hbuf + " Address: " +inet_ntoa(clientaddr.sin_addr) +"Port: " + sbuf  ;
                     CComLog::instance().log(m_strLogMsg, CComLog::Info);
 
-//                       CComLog::instance().log(m_strLogMsg);"Accepted connection on descriptor %d "
-//                              "(host=%s, port=%s)\n", connfd, , );
                 }
 
                 m_ev.data.fd = connfd;
-                // monitor in message, edge trigger
-                m_ev.events = EPOLLIN | EPOLLET;
-                // add fd to epoll queue
-                epoll_ctl(m_efd, EPOLL_CTL_ADD, connfd, &m_ev);
+                m_ev.events = EPOLLIN | EPOLLET;  // Edge Trigger
+                epoll_ctl(m_efd, EPOLL_CTL_ADD, connfd, &m_ev); // add fd to epoll queue
             }  // if (eventList[i].data.fd == m_Socket)
-            // Received data
-            else if (eventList[i].events & EPOLLIN)
+            else if (eventList[i].events & EPOLLIN)  // Received data ?
             {
-                 if (eventList[i].data.fd < 0)
-                     continue;
+                if (eventList[i].data.fd < 0)
+                    continue;
                 m_strLogMsg = "[SERVER] put task: "+ to_string(eventList[i].data.fd) + " To read queue" ;
 
                 CComLog::instance().log(m_strLogMsg, CComLog::Info);
@@ -413,9 +421,9 @@ int CEpollServer::ProcessEpoll()
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin before lock\n", pthread_self());
                 // protect task queue (readhead/readtail)
 
-		if (m_iReadMutexIndex++ > m_CtorList.nReadThreads) 
+                if (m_iReadMutexIndex++ > m_CtorList.nReadThreads)
                     m_iReadMutexIndex = 0;
-		
+
                 pthread_mutex_lock(&pR_Mutex[m_iReadMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin after lock\n", pthread_self());
                 // the queue is empty
@@ -430,8 +438,8 @@ int CEpollServer::ProcessEpoll()
                     m_TaskQue.readtail->next = new_task;
                     m_TaskQue.readtail = new_task;
                 }
-        	m_TaskQue.uiReadTasksInQ++;
-		m_TaskQue.uiTotalReadTasks++;
+                m_TaskQue.uiReadTasksInQ++;
+                m_TaskQue.uiTotalReadTasks++;
 
                 pthread_cond_broadcast(&pR_Condl[ m_iReadMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollin before unlock\n", pthread_self());
@@ -454,9 +462,9 @@ int CEpollServer::ProcessEpoll()
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollout before lock\n", pthread_self());
 //                pthread_mutex_lock(&pW_Mutex);
 
-		if (m_iWriteMutexIndex++ > m_CtorList.nWriteThreads)
+                if (m_iWriteMutexIndex++ > m_CtorList.nWriteThreads)
                     m_iWriteMutexIndex = 0;
-		
+
                 pthread_mutex_lock(&pW_Mutex[m_iWriteMutexIndex]);
                 //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d epollout after lock\n", pthread_self());
                 // the queue is empty
@@ -471,9 +479,9 @@ int CEpollServer::ProcessEpoll()
                     m_TaskQue.writetail->next = new_task;
                     m_TaskQue.writetail = new_task;
                 }
-                
-              	m_TaskQue.uiWriteTasksInQ++;
-		m_TaskQue.uiTotalWriteTasks++;
+
+                m_TaskQue.uiWriteTasksInQ++;
+                m_TaskQue.uiTotalWriteTasks++;
 
                 // trigger writetask thread
 //                pthread_cond_broadcast(&pW_Condl);
@@ -511,16 +519,14 @@ void *CEpollServer::readtask(void *args)
         // protect task queue (readhead/readtail)
         pthread_mutex_lock(&pR_Mutex[iThreadIndex ]);
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d readtask after lock\n", pthread_self());
-        while(m_TaskQue.readhead == nullptr)
-            // if condl false, will unlock mutex
+        while(m_TaskQue.readhead == nullptr)  //             // if condl false, will unlock mutex
             pthread_cond_wait(&pR_Condl[iThreadIndex ], &pR_Mutex[iThreadIndex ]);
 
         fd = m_TaskQue.readhead->data.fd;
         tmp = m_TaskQue.readhead;
         m_TaskQue.readhead = m_TaskQue.readhead->next;
         delete(tmp);
-       	m_TaskQue.uiReadTasksInQ--;
-
+        m_TaskQue.uiReadTasksInQ--;
 
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d readtask before unlock\n", pthread_self());
         pthread_mutex_unlock(&pR_Mutex[iThreadIndex ]);
@@ -598,7 +604,7 @@ void *CEpollServer::writetask(void *args)
         struct task* tmp = m_TaskQue.writehead;
         m_TaskQue.writehead = m_TaskQue.writehead->next;
         delete(tmp);
-	m_TaskQue.uiWriteTasksInQ--;
+        m_TaskQue.uiWriteTasksInQ--;
 
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d writetask before unlock\n", pthread_self());
         pthread_mutex_unlock(&pW_Mutex[iThreadIndex ]);
@@ -673,12 +679,24 @@ int CEpollServer::TerminateThreads()
 {
     std::string strExitMessage;
 
-    int iJoined = 0;
+    int ii = 0;
+
     int iTotalThreads = m_CtorList.nReadThreads + m_CtorList.nWriteThreads;
 
     for (uint ii = 0;  ii < iTotalThreads; ii++ ) {  // send a Stop message to all threads
         m_arrThreadInfo[ii].eState = TS_STOPPING;
     }
+
+    for (ii = 0; ii < m_CtorList.nReadThreads; ii++) {  
+        pthread_cond_broadcast(&pR_Condl[ ii]);   // Wil cause the while(1) loop to continue and check for TS_STOPPING  to terminate
+    }
+    
+    for (ii = 0; ii < m_CtorList.nWriteThreads; ii++) {
+        pthread_cond_broadcast(&pW_Condl[ ii]);
+    }
+
+   
+    int iJoined = 0;
 
     while (iJoined < iTotalThreads ) {
         // keep on checking for all terminated threads every three seconds
@@ -707,18 +725,17 @@ int CEpollServer::TerminateThreads()
 
     CComLog::instance().log("All Threads Joined", CComLog::Debug);
 
-    int ii = 0;
 
     for (ii = 0; ii < m_CtorList.nReadThreads; ii++) {
-        pthread_mutex_destroy(&pR_Mutex[i]);
-        pthread_cond_destroy(&pR_Condl[i]);
+        pthread_mutex_destroy(&pR_Mutex[i]);  // Destroy write mutex
+        pthread_cond_destroy(&pR_Condl[i]);   // Destroy write conditional Variables
 
     }
     CComLog::instance().log("All Read Mutexes Destroyed", CComLog::Debug);
 
     for (ii = m_CtorList.nReadThreads ; ii < (m_CtorList.nReadThreads + m_CtorList.nWriteThreads); ii++) {
-        pthread_mutex_destroy(&pW_Mutex[i]);
-        pthread_cond_destroy(&pW_Condl[i]);
+        pthread_mutex_destroy(&pW_Mutex[i]);  // Destroy read mutex
+        pthread_cond_destroy(&pW_Condl[i]);   // Destroy read conditional Variables
     }
     CComLog::instance().log("All Write Mutexes Destroyed", CComLog::Debug);
 
@@ -727,6 +744,6 @@ int CEpollServer::TerminateThreads()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TASK_QUEUE CEpollServer::GetQueueStatus()
 {
-  return m_TaskQue;
+    return m_TaskQue;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

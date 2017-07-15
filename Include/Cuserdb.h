@@ -37,7 +37,8 @@ using namespace std;
 
 
 enum eUsers {
-
+    INVALID_USER_FILE_NAME,
+    VALID_USER_FILE_NAME,
     INVALID_LOGIN_MESSAGE,
     INVALID_USER_NAME,
     INVALID_PASSWORD,
@@ -76,7 +77,7 @@ private:
   MapUserDB::iterator m_itUserMap;
   
   int m_ifd;
-  
+  int m_iError;
   int m_iSizeOfUserRecord;
   
 public:
@@ -96,6 +97,8 @@ public:
     int ListDB();                    
   
     int VerifyUser(char* szUsername, char* szPassword);
+    
+    int GetError();
     
 };
 

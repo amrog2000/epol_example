@@ -183,12 +183,13 @@ private:  // yes yes it is by default
     CuserDB* m_pCuserDB;
 //    int AuthenticateUser(char* szRecvBuffer);
     void RemoveBlanks(char* szString);
+    bool  m_bTerminate;
 
 public:
     int  PrepListener();
     int AuthenticateUser(char* szRecvBuffer);
     
-    int GetErrorCode();
+    int GetError();
     int ProcessEpoll();
     int TerminateThreads();
     TASK_QUEUE GetQueueStatus();
