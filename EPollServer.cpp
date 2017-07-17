@@ -108,7 +108,7 @@ CEpollServer::~CEpollServer()
 {
 
     // Terminate all threads
-  m_bTerminate = true;
+    m_bTerminate = true;
 
     CComLog::instance().log("Terminating Threads", CComLog::Info);
     TerminateThreads();
@@ -182,16 +182,15 @@ int CEpollServer::AuthenticateUser(char* szRecvBuffer)
 //********************************************************************************************//
 void CEpollServer::RemoveBlanks(char* szString)
 {
-    char* ptr;
+    char* ptr = nullptr;
 
     int ilen = strlen(szString);
 
     ptr = szString + strlen(szString)-1 ;
 
-  while (*ptr ==  0x20) {  //   '0x20'  Does NOT work!!!
-//    while (*ptr ==  ' ') {
-        ptr--;
-    }
+    while (*(ptr) ==  0x20)  // ascii 32 = space 
+      ptr--;
+    ;
 
     *(++ptr) = '\0';
 
@@ -317,9 +316,9 @@ int CEpollServer::ProcessEpoll()
     {
         // waiting for epoll event
         m_nfds = epoll_wait(m_efd, eventList, m_MaxEvents, m_iTimeOut);
-	if (m_bTerminate)
-	  break;
-	
+        if (m_bTerminate)
+            break;
+
         // In case of edge trigger, must go over each event
         for (i = 0; i < m_nfds; ++i)
         {
@@ -687,15 +686,15 @@ int CEpollServer::TerminateThreads()
         m_arrThreadInfo[ii].eState = TS_STOPPING;
     }
 
-    for (ii = 0; ii < m_CtorList.nReadThreads; ii++) {  
+    for (ii = 0; ii < m_CtorList.nReadThreads; ii++) {
         pthread_cond_broadcast(&pR_Condl[ ii]);   // Wil cause the while(1) loop to continue and check for TS_STOPPING  to terminate
     }
-    
+
     for (ii = 0; ii < m_CtorList.nWriteThreads; ii++) {
         pthread_cond_broadcast(&pW_Condl[ ii]);
     }
 
-   
+
     int iJoined = 0;
 
     while (iJoined < iTotalThreads ) {

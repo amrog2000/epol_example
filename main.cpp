@@ -34,10 +34,10 @@ int main(int argc,char* argv[])
 
     if (argc == 3) { // Look for 'U' for DB          //  <U  UserDB.qtx>  for example
 
-      cout << "Running in user Database mode" << endl;;
-      cout << "User Filename: " << argv[2];
-    
-	CuserDB* pCuserDB = nullptr;
+        cout << "Running in user Database mode" << endl;;
+        cout << "User Filename: " << argv[2];
+
+        CuserDB* pCuserDB = nullptr;
         char szUserDBFile[MAX_PATH];
 
         memset(szUserDBFile, '\0', MAX_PATH);
@@ -46,120 +46,122 @@ int main(int argc,char* argv[])
 
         if (!strncmp(argv[1], "U", 1)) {  // 'U' in upper case
             CComLog::instance().log("Starting Server for User Database Management", CComLog::Info);
-	    cout << endl;
-            cout << "1  Add <username> <password>  <group ID>  <acess level> " << endl;
-            cout << "2  Modify <username> <active>  <iGroupID>  <Access Level > " << endl;
-            cout << "3  Change password <username> <new password>  " << endl;	    
-            cout << "4  Delete <username> " << endl;
-            cout << "5  List DB " << endl;
-	    cout << "0  Quit  " << endl;
-	    cout << endl;
 
             char szUserName[SIZE_NAME];
             char szPassword[SIZE_NAME];
 
-            memset( szUserName, '\0', SIZE_NAME); 
-            memset( szPassword, '\0', SIZE_NAME); 
+            memset( szUserName, '\0', SIZE_NAME);
+            memset( szPassword, '\0', SIZE_NAME);
 
-	    int bActive = 0, iGroupID = 0, iAccessLevel = 0;
+            int bActive = 0, iGroupID = 0, iAccessLevel = 0;
 
-	    int iRet = 0;
-	    
+            int iRet = 0;
+
             int iSelection = 5;
             while (iSelection != 0) {
-	      cout << endl;	
-	      cout << "Enter Selection:" ;
-		cin.clear();
+                cout << endl;
+                cout << "1  Add <username> <password>  <group ID>  <acess level> " << endl;
+                cout << "2  Modify <username> <active>  <iGroupID>  <Access Level > " << endl;
+                cout << "3  Change password <username> <new password>  " << endl;
+                cout << "4  Delete <username> " << endl;
+                cout << "5  List DB " << endl;
+                cout << "0  Quit  " << endl;
+                cout << endl<< endl;;
+
+                cout << "Enter Selection:" ;
+                cin.clear();
                 cin >> iSelection;
-		cout << iSelection  << endl;
-		
+                cout << iSelection  << endl;
+
                 switch (iSelection) {
                 case 1:
-		    cout << "Add User" << endl;		  
-		    cout << "Enter UserName  Password  GroupID  iAccessLevel" << endl;
+                    cout << "Add User" << endl;
+                    cout << "Enter UserName  Password  GroupID  iAccessLevel" << endl;
                     cin >> szUserName >> szPassword >> iGroupID >> iAccessLevel;
-		    
-                   iRet =  pCuserDB->AddUser(szUserName, szPassword, iGroupID, iAccessLevel);
-		   if (iRet == USER_ALREADY_EXIST)
-		     cout << "User Already Exist" << endl  << endl;
-		   else
-		      cout << "User Added "  << endl  << endl;
+
+                    iRet =  pCuserDB->AddUser(szUserName, szPassword, iGroupID, iAccessLevel);
+                    if (iRet == USER_ALREADY_EXIST)
+                        cout << "User Already Exist" << endl  << endl;
+                    else
+                        cout << "User Added "  << endl  << endl;
                     break;
 
                 case 2:
-		    cout << "Modify User" << endl;		  
-		    cout << "Enter UserName  Active (0/1)  Group ID  Access Level " << endl;
+                    cout << "Modify User" << endl;
+                    cout << "Enter UserName  Active (0/1)  Group ID  Access Level " << endl;
 
-		    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
+                    cin >> szUserName >> bActive >> iGroupID >> iAccessLevel ;
                     pCuserDB->ModifyUser(szUserName, bActive, iGroupID, iAccessLevel);
                     break;
-		    
+
                 case 3:
-		    cout << "Change User Passwordr" << endl;		  
-		    cout << "Enter UserName  Password " << endl;
-		  
+                    cout << "Change User Passwordr" << endl;
+                    cout << "Enter UserName  Password " << endl;
+
                     cin >> szUserName >> szPassword ;
 //		    cout << "Enter UserName  Password " << endl;
                     iRet = pCuserDB->ChangeUserPassword(szUserName, szPassword);
-		    if(iRet == INVALID_USER_NAME)
-		      cout << "Invalid Username" << endl<< endl;
-		    else
-		      cout << "Password changed "  << endl << endl;
+                    if(iRet == INVALID_USER_NAME)
+                        cout << "Invalid Username" << endl<< endl;
+                    else
+                        cout << "Password changed "  << endl << endl;
                     break;
-		    
-            
+
+
                 case 4:
-		    cout << "Delete User" << endl;		  
-		    cout << "Enter UserName" << endl;
-		  
+                    cout << "Delete User" << endl;
+                    cout << "Enter UserName" << endl;
+
                     cin >> szUserName;
                     iRet = pCuserDB->DeleteUser(szUserName);
-		    if (iRet == INVALID_USER_NAME)
-			cout << "Invalid User name" <<  endl << endl;
-		    else
-			cout << "User Deleted " << endl << endl;		      
+                    if (iRet == INVALID_USER_NAME)
+                        cout << "Invalid User name" <<  endl << endl;
+                    else
+                        cout << "User Deleted " << endl << endl;
                     break;
 
                 case 5:
-		    cout << "List Users" << endl << endl;		  		  
-                    pCuserDB->ListDB();
+                    cout << "Listing Users" << endl << endl;
+                    iRet = pCuserDB->ListDB();
+                    cout << endl << endl;
+                    cout << to_string(iRet) << " Users" << endl;
                     break;
 
                 default:
-		  continue;
+                    continue;
                     break;
 
                 } // switch
                 if (iSelection == 0) {
-		    pCuserDB->SaveUserFile();
+                    pCuserDB->SaveUserFile();
                     delete pCuserDB;
-		    
-		    cout << " Successfull Termination";
-		    exit(EXIT_SUCCESS);
+
+                    cout << " Successfull Termination";
+                    exit(EXIT_SUCCESS);
                     break; // unreachable code
-                } // if (iSelection == 0) 
+                } // if (iSelection == 0)
             }//      while (iSelection != 0)
         }//if (!strncmp(argv[1], "U", 1)) {  // 'U' in upper case
-        if (pCuserDB){
-	   delete pCuserDB;
-	   exit(EXIT_SUCCESS);
-	}
+        if (pCuserDB) {
+            delete pCuserDB;
+            exit(EXIT_SUCCESS);
+        }
     }  //    if (argc == 3 0)  // Look for "U" for user db mode
 
     // argc == 2           //   <./QuantCom UserDB.qtx>  for example
     if (!argv[1] ) {
-      // ::TODO error message
-	exit(EXIT_FAILURE);      
+        // ::TODO error message
+        exit(EXIT_FAILURE);
     }
-    
+
     strcpy(SEpoll_Ctor.szUserFileName, argv[1]);
-    
+
     CEpollServer* pCEpoll = nullptr;
     pCEpoll = new CEpollServer(SEpoll_Ctor);
 
-    if (!pCEpoll){
-      CComLog::instance().log("Failure Getting an instance of EPOll Server", CComLog::Error);
-      exit(EXIT_FAILURE);
+    if (!pCEpoll) {
+        CComLog::instance().log("Failure Getting an instance of EPOll Server", CComLog::Error);
+        exit(EXIT_FAILURE);
     }
 
     if (pCEpoll->GetError() > 100)
@@ -185,7 +187,7 @@ int main(int argc,char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();  // Monitor 
+    TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();  // Monitor
 // output TQueue
 
 //     pCEpoll->TerminateThreads();  // Called by the destructor
