@@ -29,6 +29,7 @@ public:
 		const std::string& inLogLevel);
 
 	char* GetFormatedDateTime();
+	char* GetFormatedDate();	
 protected:
 	// Static variable for the one-and-only instance  
 	static CComLog* pInstance;
@@ -60,7 +61,7 @@ private:
 	CComLog(const CComLog&);
 	CComLog& operator=(const CComLog&);
 	static std::mutex sMutex;
-	char* GetFormatedDate();
+
 };
 
 

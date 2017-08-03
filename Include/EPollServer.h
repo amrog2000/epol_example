@@ -53,18 +53,25 @@ enum tstate {
     TS_STARTING,
     TS_STARTED,
     TS_ALIVE,
+    TS_WAITING,
+    TS_RUNNING,
     TS_TERMINATED,
     TS_STOPPING,
     TS_JOINED
 };
 
-typedef struct thread_info
-{   /* Used as argument to thread_start() */
+typedef struct thread_info{   /* Used as argument to thread_start() */
     pthread_t 	thread_id;        /* ID returned by pthread_create() */
-    enum 	tstate eState;
+    enum 	tstate eState;  // refer to enum tstate above
     int       	iThread_num;       /* Application-defined thread # */
     char     	*thread_message;      /* Saying Hello */
 } THREAD_INFO;
+
+typedef struct ThreadPool {
+  int iThreadID;
+  uint16_t uiThreadState; 
+  struct ThreadPool* pNext; 
+}THREAD_POOL;
 
 // task item in thread pool
 struct task
@@ -166,6 +173,10 @@ private:  // yes yes it is by default
 
     static    void *readtask(void *args);
     static    void *writetask(void *args);
+    
+    static    int GetReadThreadFromPool(int  );  
+
+    static    int GetWriteThreadFromPool(int  );  
 
     EPOLL_CTOR_LIST m_CtorList;
 
@@ -183,8 +194,11 @@ private:  // yes yes it is by default
     CuserDB* m_pCuserDB;
 //    int AuthenticateUser(char* szRecvBuffer);
     void RemoveBlanks(char* szString);
-    bool  m_bTerminate;
+    static bool  m_bTerminate;
 
+    static    THREAD_INFO* m_arrReadThreadInfo;
+    static    THREAD_INFO* m_arrWriteThreadInfo;    
+    
 public:
     int  PrepListener();
     int AuthenticateUser(char* szRecvBuffer);
@@ -194,7 +208,7 @@ public:
     int TerminateThreads();
     TASK_QUEUE GetQueueStatus();
 
-    static    THREAD_INFO* m_arrThreadInfo;
+
 
 };
 

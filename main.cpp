@@ -5,8 +5,18 @@
 #include "EPollServer.h"
 #include <iostream>
 
+
+//    ./QuantCom U  UserDB.qtx     	// to start the server in user Database mode
+//    ./QuantCom  UserDB.qtx     	// to start the server in communication mode
+
+// Test with this line in telnet for Login, spaces are part of the login message to pad for the full length of field  (without the last dot):
+//L Amro        Amro        .
+//L Mohamed     Mohamed     .
+//L Heba        Lipo        .
+//L Abdo        Abdo        .
+
 using namespace std;
-// U  UserDB.qtx
+
 #define	    SIZE_NAME  15
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,8 +27,8 @@ int main(int argc,char* argv[])
     EPOLL_CTOR_LIST SEpoll_Ctor;
     //  initialize the structure here to construct the server
     SEpoll_Ctor.iLoadFactor =  10;
-    SEpoll_Ctor.nReadThreads = 5;
-    SEpoll_Ctor.nWriteThreads = 5;
+    SEpoll_Ctor.nReadThreads = 11;
+    SEpoll_Ctor.nWriteThreads = 11;
     SEpoll_Ctor.iNumOFileDescriptors = 1000;
     strcpy(SEpoll_Ctor.szServerPort, "9998");
     SEpoll_Ctor.iTimeOut = 1000;
@@ -158,9 +168,15 @@ int main(int argc,char* argv[])
 
     CEpollServer* pCEpoll = nullptr;
     pCEpoll = new CEpollServer(SEpoll_Ctor);
-
+    
     if (!pCEpoll) {
         CComLog::instance().log("Failure Getting an instance of EPOll Server", CComLog::Error);
+        exit(EXIT_FAILURE);
+    }
+
+    if (pCEpoll->GetError() == INVALID_USER_FILE_NAME) {  // can't continue
+        CComLog::instance().log("Invalid User File Name", CComLog::Error);
+	delete pCEpoll;
         exit(EXIT_FAILURE);
     }
 
@@ -172,23 +188,19 @@ int main(int argc,char* argv[])
     }
 
     pCEpoll->PrepListener();
-    if (pCEpoll->GetError() > 100)
-    {
+    if (pCEpoll->GetError() > 100) {
         CComLog::instance().log("Failure to Listen EPOll Server", CComLog::Error);
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
-//    pCEpoll->AuthenticateUser("L Amro        Amro        "); for test purposes only
     pCEpoll->ProcessEpoll();   // main driver loop here
-    if (pCEpoll->GetError() > 100)
-    {
+    if (pCEpoll->GetError() > 100) {
         CComLog::instance().log("Failure to Process EPOll Server", CComLog::Error);
         delete pCEpoll;
         exit(EXIT_FAILURE);
     }
 
     TASK_QUEUE TQueue =   pCEpoll->GetQueueStatus();  // Monitor
-// output TQueue
 
 //     pCEpoll->TerminateThreads();  // Called by the destructor
 
