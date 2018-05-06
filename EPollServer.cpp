@@ -959,7 +959,7 @@ float Q_rsqrt( float number )
 	return y;
 }
 //////// Experiment:: End ////////////////////////
-
+/*
 
 void CTestClass::MyFunction(char* szString)
 {
@@ -970,4 +970,4 @@ void CTestClass::MyFunction(char* szString)
     while (*(--ptr) ==  0x20) 
         ;
     *(++ptr) = '\0';
-}
+}*/
