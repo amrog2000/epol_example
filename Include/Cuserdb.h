@@ -28,6 +28,7 @@ using namespace std;
 #include <string>
 #include <string.h>
 #include <unordered_map>
+#include <unordered_set>
 #include "ComLog.h"
 
 #define SIZE_USERNAME 15
@@ -76,6 +77,7 @@ private:
   MapUserDB m_UserMap;
   MapUserDB::iterator m_itUserMap;
   
+  unordered_set <int> my_set;
   int m_ifd;
   int m_iError;
   int m_iSizeOfUserRecord;

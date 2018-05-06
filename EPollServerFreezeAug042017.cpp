@@ -1,3 +1,4 @@
+
 // Test with this line in telnet for Login (without the last dot):
 //L Amro        Amro        .
 #include "EPollServer.h"
@@ -24,14 +25,12 @@ THREAD_INFO*       CEpollServer::m_arrWriteThreadInfo;
 string 		   CEpollServer::m_strLogMsg;
 bool CEpollServer::m_bTerminate = false;
 
-
-
 //********************************************************************************************//
 CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
 {
     string strLog;
     strLog.clear();
-
+    
     m_iError = -1;
     memset(m_szUserFileName, '\0', MAX_PATH);
     strcpy(m_szUserFileName, m_CtorList.szUserFileName);
@@ -40,37 +39,37 @@ CEpollServer::CEpollServer(EPOLL_CTOR_LIST  CtorList):m_CtorList(CtorList)
 
     strLog = "Load Factor: " + to_string(m_CtorList.iLoadFactor);
     CComLog::instance().log(strLog , CComLog::Info);
-
+    
     strLog = "Number of file descriptors: " + to_string(m_CtorList.iNumOFileDescriptors);
     CComLog::instance().log( strLog, CComLog::Info);
-
+    
     strLog =  "Timeout: " + to_string(m_CtorList.iTimeOut);
     CComLog::instance().log(strLog , CComLog::Info);
 
     strLog = "Local Address: " +  to_string(m_CtorList.Local_addr);
+    CComLog::instance().log( strLog, CComLog::Info);  
+    
+    strLog = "Server Listen Port: " +  string(m_CtorList.szServerPort);    
     CComLog::instance().log( strLog, CComLog::Info);
-
-    strLog = "Server Listen Port: " +  string(m_CtorList.szServerPort);
-    CComLog::instance().log( strLog, CComLog::Info);
-
-    strLog = "Max Bytes to read: " +  to_string(m_CtorList.MaxByte);
+    
+    strLog = "Max Bytes to read: " +  to_string(m_CtorList.MaxByte);   
     CComLog::instance().log( strLog , CComLog::Info);
-
+    
     strLog = "Max Events: "  +  to_string(m_CtorList.MaxEvents);
-    CComLog::instance().log( strLog , CComLog::Info);
-
+    CComLog::instance().log( strLog , CComLog::Info);  
+    
     strLog = "Number of Read Threads: " + to_string(m_CtorList.nReadThreads);
     CComLog::instance().log(strLog , CComLog::Info);
-
+    
     strLog =  "Number of Write Threads: " + to_string(m_CtorList.nWriteThreads);
-    CComLog::instance().log( strLog , CComLog::Info);
-
+    CComLog::instance().log( strLog , CComLog::Info);  
+    
     strLog =  "Max Open descriptors: " +  to_string(m_CtorList.Open_Max);
-    CComLog::instance().log( strLog , CComLog::Info);
-
+    CComLog::instance().log( strLog , CComLog::Info);  
+    
     strLog =   "User DB File Name: " +  string(m_CtorList.szUserFileName);
-    CComLog::instance().log(strLog , CComLog::Info);
-
+    CComLog::instance().log(strLog , CComLog::Info);  
+   
     m_pCuserDB = nullptr;
 
     m_pCuserDB = new CuserDB(m_szUserFileName);
@@ -221,7 +220,7 @@ CEpollServer::~CEpollServer()
     }
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
     CComLog::instance().log("Destruction Completed", CComLog::Info);
-    CComLog::instance().log("===========================================================================================================================", CComLog::Info);
+    CComLog::instance().log("===========================================================================================================================", CComLog::Info);    
 }
 //********************************************************************************************//
 int CEpollServer::AuthenticateUser(char* szRecvBuffer)
@@ -692,9 +691,9 @@ void *CEpollServer::writetask(void *args)
 
         rdata = (struct user_data*)m_TaskQue.writehead->data.ptr;
 
-        struct task* tmp = m_TaskQue.writehead;  // temp points to Queue head
-        m_TaskQue.writehead = m_TaskQue.writehead->next;   // Queue head point to next
-        delete(tmp);					// delete Queue head
+        struct task* tmp = m_TaskQue.writehead;
+        m_TaskQue.writehead = m_TaskQue.writehead->next;
+        delete(tmp);
         m_TaskQue.uiWriteTasksInQ--;
 
         //CComLog::instance().log(m_strLogMsg);"[SERVER] thread %d writetask before unlock\n", pthread_self());
@@ -839,7 +838,7 @@ int CEpollServer::TerminateThreads()
     CComLog::instance().log("Joining Write Threads", CComLog::Info);
     CComLog::instance().log("===========================================================================================================================", CComLog::Info);
 
-
+    
     while (iJoined < m_CtorList.nWriteThreads ) {
         // keep on checking for all terminated threads every three seconds
 
@@ -937,37 +936,3 @@ int CEpollServer::GetWriteThreadFromPool(int nWriteThreads)
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//////// Experiment:: begin ////////////////////////
-float Q_rsqrt( float number );
-
-//********************************************************************************************//
-float Q_rsqrt( float number )
-{
-	long i;
-	float x2, y;
-	const float threehalfs = 1.5F;
- 
-	x2 = number * 0.5F;
-	y  = number;
-	i  = * ( long * ) &y;                       // evil floating point bit level hacking
-	i  = 0x5f3759df - ( i >> 1 );               // what the fuck? 
-	y  = * ( float * ) &i;
-	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
- 
-	return y;
-}
-//////// Experiment:: End ////////////////////////
-
-
-void CTestClass::MyFunction(char* szString)
-{
-    char* ptr = nullptr;
-
-    ptr = szString + strlen(szString) -1 ;
-
-    while (*(--ptr) ==  0x20) 
-        ;
-    *(++ptr) = '\0';
-}

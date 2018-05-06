@@ -46,6 +46,9 @@ CuserDB::CuserDB(char* szUserFileName)
         strMsg = "Inserted: " + to_string(nCount) + " User Records";
         CComLog::instance().log(strMsg, CComLog::Info);
     } // else
+    
+    my_set.insert(1);
+    my_set.insert(iRecSize);
 
 }
 //********************************************************************************************//

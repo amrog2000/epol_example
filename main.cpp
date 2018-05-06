@@ -27,8 +27,8 @@ int main(int argc,char* argv[])
     EPOLL_CTOR_LIST SEpoll_Ctor;
     //  initialize the structure here to construct the server
     SEpoll_Ctor.iLoadFactor =  10;
-    SEpoll_Ctor.nReadThreads = 11;
-    SEpoll_Ctor.nWriteThreads = 11;
+    SEpoll_Ctor.nReadThreads = 100;
+    SEpoll_Ctor.nWriteThreads = 100;
     SEpoll_Ctor.iNumOFileDescriptors = 1000;
     strcpy(SEpoll_Ctor.szServerPort, "9998");
     SEpoll_Ctor.iTimeOut = 1000;
