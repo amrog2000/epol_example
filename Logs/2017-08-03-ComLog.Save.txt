@@ -1,0 +1,447 @@
+2017-08-03- 18:31:59: [I] : ===========================================================================================================================
+2017-08-03- 18:31:59: [I] : Starting EPOll Server
+2017-08-03- 18:31:59: [I] : ===========================================================================================================================
+2017-08-03- 18:31:59: [I] : Epoll Server...Constructing with the following parameters: 
+2017-08-03- 18:31:59: [I] : Load Factor: 10
+2017-08-03- 18:31:59: [I] : Number of file descriptors: 1000
+2017-08-03- 18:31:59: [I] : Timeout: 1000
+2017-08-03- 18:31:59: [I] : Local Address: 7
+2017-08-03- 18:31:59: [I] : Server Listen Port: 9998
+2017-08-03- 18:31:59: [I] : Max Bytes to read: 1000
+2017-08-03- 18:31:59: [I] : Max Events: 1000
+2017-08-03- 18:31:59: [I] : Number of Read Threads: 100
+2017-08-03- 18:31:59: [I] : Number of Write Threads: 100
+2017-08-03- 18:31:59: [I] : Max Open descriptors: 1000
+2017-08-03- 18:31:59: [I] : User DB File Name: UserDB.qtx
+2017-08-03- 18:31:59: [I] : Inserted: 10 User Records
+2017-08-03- 18:32:19: [I] : Epoll Server...Successfull Construction
+2017-08-03- 18:32:19: [E] : Entering epoll loop waiting for connections
+2017-08-03- 18:32:35: [I] : Exited from epoll loop 
+2017-08-03- 18:32:35: [I] : Terminating Threads
+2017-08-03- 18:32:36: [D] : Terminating Read Threads
+2017-08-03- 18:32:36: [D] : Terminating Write Threads
+2017-08-03- 18:32:36: [I] : ===========================================================================================================================
+2017-08-03- 18:32:36: [I] : Joining Read Threads
+2017-08-03- 18:32:36: [I] : ===========================================================================================================================
+2017-08-03- 18:32:36: [D] : Thread Number: 140039429089024 Joined
+2017-08-03- 18:32:36: [D] : Joined: 1 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039420696320 Joined
+2017-08-03- 18:32:36: [D] : Joined: 2 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039412303616 Joined
+2017-08-03- 18:32:36: [D] : Joined: 3 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039403910912 Joined
+2017-08-03- 18:32:36: [D] : Joined: 4 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039219271424 Joined
+2017-08-03- 18:32:36: [D] : Joined: 5 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039210878720 Joined
+2017-08-03- 18:32:36: [D] : Joined: 6 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039202486016 Joined
+2017-08-03- 18:32:36: [D] : Joined: 7 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039194093312 Joined
+2017-08-03- 18:32:36: [D] : Joined: 8 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039185700608 Joined
+2017-08-03- 18:32:36: [D] : Joined: 9 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039177307904 Joined
+2017-08-03- 18:32:36: [D] : Joined: 10 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039152129792 Joined
+2017-08-03- 18:32:36: [D] : Joined: 11 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039135344384 Joined
+2017-08-03- 18:32:36: [D] : Joined: 12 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039126951680 Joined
+2017-08-03- 18:32:36: [D] : Joined: 13 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039118558976 Joined
+2017-08-03- 18:32:36: [D] : Joined: 14 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039101773568 Joined
+2017-08-03- 18:32:36: [D] : Joined: 15 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039084988160 Joined
+2017-08-03- 18:32:36: [D] : Joined: 16 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039076595456 Joined
+2017-08-03- 18:32:36: [D] : Joined: 17 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039059810048 Joined
+2017-08-03- 18:32:36: [D] : Joined: 18 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039043024640 Joined
+2017-08-03- 18:32:36: [D] : Joined: 19 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039034631936 Joined
+2017-08-03- 18:32:36: [D] : Joined: 20 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039017846528 Joined
+2017-08-03- 18:32:36: [D] : Joined: 21 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039009453824 Joined
+2017-08-03- 18:32:36: [D] : Joined: 22 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140039001061120 Joined
+2017-08-03- 18:32:36: [D] : Joined: 23 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038992668416 Joined
+2017-08-03- 18:32:36: [D] : Joined: 24 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038967490304 Joined
+2017-08-03- 18:32:36: [D] : Joined: 25 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038959097600 Joined
+2017-08-03- 18:32:36: [D] : Joined: 26 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038950704896 Joined
+2017-08-03- 18:32:36: [D] : Joined: 27 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038933919488 Joined
+2017-08-03- 18:32:36: [D] : Joined: 28 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038925526784 Joined
+2017-08-03- 18:32:36: [D] : Joined: 29 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038908741376 Joined
+2017-08-03- 18:32:36: [D] : Joined: 30 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038900348672 Joined
+2017-08-03- 18:32:36: [D] : Joined: 31 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038891955968 Joined
+2017-08-03- 18:32:36: [D] : Joined: 32 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038875170560 Joined
+2017-08-03- 18:32:36: [D] : Joined: 33 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038866777856 Joined
+2017-08-03- 18:32:36: [D] : Joined: 34 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038858385152 Joined
+2017-08-03- 18:32:36: [D] : Joined: 35 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038849992448 Joined
+2017-08-03- 18:32:36: [D] : Joined: 36 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038841599744 Joined
+2017-08-03- 18:32:36: [D] : Joined: 37 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038833207040 Joined
+2017-08-03- 18:32:36: [D] : Joined: 38 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038824814336 Joined
+2017-08-03- 18:32:36: [D] : Joined: 39 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038808028928 Joined
+2017-08-03- 18:32:36: [D] : Joined: 40 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038799636224 Joined
+2017-08-03- 18:32:36: [D] : Joined: 41 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038791243520 Joined
+2017-08-03- 18:32:36: [D] : Joined: 42 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038782850816 Joined
+2017-08-03- 18:32:36: [D] : Joined: 43 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038766065408 Joined
+2017-08-03- 18:32:36: [D] : Joined: 44 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038757672704 Joined
+2017-08-03- 18:32:36: [D] : Joined: 45 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038749280000 Joined
+2017-08-03- 18:32:36: [D] : Joined: 46 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038732494592 Joined
+2017-08-03- 18:32:36: [D] : Joined: 47 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038724101888 Joined
+2017-08-03- 18:32:36: [D] : Joined: 48 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038715709184 Joined
+2017-08-03- 18:32:36: [D] : Joined: 49 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038707316480 Joined
+2017-08-03- 18:32:36: [D] : Joined: 50 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038698923776 Joined
+2017-08-03- 18:32:36: [D] : Joined: 51 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038690531072 Joined
+2017-08-03- 18:32:36: [D] : Joined: 52 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038682138368 Joined
+2017-08-03- 18:32:36: [D] : Joined: 53 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038673745664 Joined
+2017-08-03- 18:32:36: [D] : Joined: 54 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038656960256 Joined
+2017-08-03- 18:32:36: [D] : Joined: 55 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038648567552 Joined
+2017-08-03- 18:32:36: [D] : Joined: 56 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038640174848 Joined
+2017-08-03- 18:32:36: [D] : Joined: 57 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038631782144 Joined
+2017-08-03- 18:32:36: [D] : Joined: 58 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038623389440 Joined
+2017-08-03- 18:32:36: [D] : Joined: 59 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038614996736 Joined
+2017-08-03- 18:32:36: [D] : Joined: 60 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038606604032 Joined
+2017-08-03- 18:32:36: [D] : Joined: 61 Thread  out of: 100
+2017-08-03- 18:32:36: [D] : Thread Number: 140038598211328 Joined
+2017-08-03- 18:32:36: [D] : Joined: 62 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039395518208 Joined
+2017-08-03- 18:32:46: [D] : Joined: 63 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039387125504 Joined
+2017-08-03- 18:32:46: [D] : Joined: 64 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039378732800 Joined
+2017-08-03- 18:32:46: [D] : Joined: 65 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039370340096 Joined
+2017-08-03- 18:32:46: [D] : Joined: 66 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039361947392 Joined
+2017-08-03- 18:32:46: [D] : Joined: 67 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039353554688 Joined
+2017-08-03- 18:32:46: [D] : Joined: 68 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039345161984 Joined
+2017-08-03- 18:32:46: [D] : Joined: 69 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039336769280 Joined
+2017-08-03- 18:32:46: [D] : Joined: 70 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039328376576 Joined
+2017-08-03- 18:32:46: [D] : Joined: 71 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039319983872 Joined
+2017-08-03- 18:32:46: [D] : Joined: 72 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039311591168 Joined
+2017-08-03- 18:32:46: [D] : Joined: 73 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039303198464 Joined
+2017-08-03- 18:32:46: [D] : Joined: 74 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039294805760 Joined
+2017-08-03- 18:32:46: [D] : Joined: 75 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039286413056 Joined
+2017-08-03- 18:32:46: [D] : Joined: 76 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039278020352 Joined
+2017-08-03- 18:32:46: [D] : Joined: 77 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039269627648 Joined
+2017-08-03- 18:32:46: [D] : Joined: 78 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039261234944 Joined
+2017-08-03- 18:32:46: [D] : Joined: 79 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039252842240 Joined
+2017-08-03- 18:32:46: [D] : Joined: 80 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039244449536 Joined
+2017-08-03- 18:32:46: [D] : Joined: 81 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039236056832 Joined
+2017-08-03- 18:32:46: [D] : Joined: 82 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039227664128 Joined
+2017-08-03- 18:32:46: [D] : Joined: 83 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039168915200 Joined
+2017-08-03- 18:32:46: [D] : Joined: 84 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039160522496 Joined
+2017-08-03- 18:32:46: [D] : Joined: 85 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039143737088 Joined
+2017-08-03- 18:32:46: [D] : Joined: 86 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039110166272 Joined
+2017-08-03- 18:32:46: [D] : Joined: 87 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039093380864 Joined
+2017-08-03- 18:32:46: [D] : Joined: 88 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039068202752 Joined
+2017-08-03- 18:32:46: [D] : Joined: 89 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039051417344 Joined
+2017-08-03- 18:32:46: [D] : Joined: 90 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140039026239232 Joined
+2017-08-03- 18:32:46: [D] : Joined: 91 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038984275712 Joined
+2017-08-03- 18:32:46: [D] : Joined: 92 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038975883008 Joined
+2017-08-03- 18:32:46: [D] : Joined: 93 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038942312192 Joined
+2017-08-03- 18:32:46: [D] : Joined: 94 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038917134080 Joined
+2017-08-03- 18:32:46: [D] : Joined: 95 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038883563264 Joined
+2017-08-03- 18:32:46: [D] : Joined: 96 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038816421632 Joined
+2017-08-03- 18:32:46: [D] : Joined: 97 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038774458112 Joined
+2017-08-03- 18:32:46: [D] : Joined: 98 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038740887296 Joined
+2017-08-03- 18:32:46: [D] : Joined: 99 Thread  out of: 100
+2017-08-03- 18:32:46: [D] : Thread Number: 140038665352960 Joined
+2017-08-03- 18:32:46: [D] : Joined: 100 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : All Read Threads Joined
+2017-08-03- 18:32:49: [I] : ===========================================================================================================================
+2017-08-03- 18:32:49: [I] : Joining Write Threads
+2017-08-03- 18:32:49: [I] : ===========================================================================================================================
+2017-08-03- 18:32:49: [D] : Thread Number: 140038589818624 Joined
+2017-08-03- 18:32:49: [D] : Joined: 1 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038581425920 Joined
+2017-08-03- 18:32:49: [D] : Joined: 2 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038573033216 Joined
+2017-08-03- 18:32:49: [D] : Joined: 3 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038564640512 Joined
+2017-08-03- 18:32:49: [D] : Joined: 4 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038556247808 Joined
+2017-08-03- 18:32:49: [D] : Joined: 5 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038547855104 Joined
+2017-08-03- 18:32:49: [D] : Joined: 6 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038539462400 Joined
+2017-08-03- 18:32:49: [D] : Joined: 7 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038531069696 Joined
+2017-08-03- 18:32:49: [D] : Joined: 8 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038522676992 Joined
+2017-08-03- 18:32:49: [D] : Joined: 9 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038514284288 Joined
+2017-08-03- 18:32:49: [D] : Joined: 10 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038505891584 Joined
+2017-08-03- 18:32:49: [D] : Joined: 11 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038497498880 Joined
+2017-08-03- 18:32:49: [D] : Joined: 12 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038489106176 Joined
+2017-08-03- 18:32:49: [D] : Joined: 13 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038480713472 Joined
+2017-08-03- 18:32:49: [D] : Joined: 14 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038472320768 Joined
+2017-08-03- 18:32:49: [D] : Joined: 15 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038463928064 Joined
+2017-08-03- 18:32:49: [D] : Joined: 16 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038455535360 Joined
+2017-08-03- 18:32:49: [D] : Joined: 17 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038447142656 Joined
+2017-08-03- 18:32:49: [D] : Joined: 18 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038438749952 Joined
+2017-08-03- 18:32:49: [D] : Joined: 19 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038430357248 Joined
+2017-08-03- 18:32:49: [D] : Joined: 20 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038421964544 Joined
+2017-08-03- 18:32:49: [D] : Joined: 21 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038413571840 Joined
+2017-08-03- 18:32:49: [D] : Joined: 22 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038405179136 Joined
+2017-08-03- 18:32:49: [D] : Joined: 23 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038396786432 Joined
+2017-08-03- 18:32:49: [D] : Joined: 24 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038388393728 Joined
+2017-08-03- 18:32:49: [D] : Joined: 25 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038380001024 Joined
+2017-08-03- 18:32:49: [D] : Joined: 26 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038371608320 Joined
+2017-08-03- 18:32:49: [D] : Joined: 27 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038363215616 Joined
+2017-08-03- 18:32:49: [D] : Joined: 28 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038354822912 Joined
+2017-08-03- 18:32:49: [D] : Joined: 29 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038346430208 Joined
+2017-08-03- 18:32:49: [D] : Joined: 30 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038338037504 Joined
+2017-08-03- 18:32:49: [D] : Joined: 31 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038329644800 Joined
+2017-08-03- 18:32:49: [D] : Joined: 32 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038321252096 Joined
+2017-08-03- 18:32:49: [D] : Joined: 33 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038312859392 Joined
+2017-08-03- 18:32:49: [D] : Joined: 34 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038304466688 Joined
+2017-08-03- 18:32:49: [D] : Joined: 35 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038296073984 Joined
+2017-08-03- 18:32:49: [D] : Joined: 36 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038287681280 Joined
+2017-08-03- 18:32:49: [D] : Joined: 37 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038279288576 Joined
+2017-08-03- 18:32:49: [D] : Joined: 38 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038270895872 Joined
+2017-08-03- 18:32:49: [D] : Joined: 39 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038262503168 Joined
+2017-08-03- 18:32:49: [D] : Joined: 40 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038254110464 Joined
+2017-08-03- 18:32:49: [D] : Joined: 41 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038245717760 Joined
+2017-08-03- 18:32:49: [D] : Joined: 42 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038237325056 Joined
+2017-08-03- 18:32:49: [D] : Joined: 43 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038228932352 Joined
+2017-08-03- 18:32:49: [D] : Joined: 44 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038220539648 Joined
+2017-08-03- 18:32:49: [D] : Joined: 45 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038212146944 Joined
+2017-08-03- 18:32:49: [D] : Joined: 46 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038203754240 Joined
+2017-08-03- 18:32:49: [D] : Joined: 47 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038195361536 Joined
+2017-08-03- 18:32:49: [D] : Joined: 48 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038186968832 Joined
+2017-08-03- 18:32:49: [D] : Joined: 49 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038178576128 Joined
+2017-08-03- 18:32:49: [D] : Joined: 50 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038170183424 Joined
+2017-08-03- 18:32:49: [D] : Joined: 51 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038161790720 Joined
+2017-08-03- 18:32:49: [D] : Joined: 52 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038153398016 Joined
+2017-08-03- 18:32:49: [D] : Joined: 53 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038145005312 Joined
+2017-08-03- 18:32:49: [D] : Joined: 54 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038136612608 Joined
+2017-08-03- 18:32:49: [D] : Joined: 55 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038128219904 Joined
+2017-08-03- 18:32:49: [D] : Joined: 56 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038119827200 Joined
+2017-08-03- 18:32:49: [D] : Joined: 57 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038111434496 Joined
+2017-08-03- 18:32:49: [D] : Joined: 58 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038103041792 Joined
+2017-08-03- 18:32:49: [D] : Joined: 59 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038094649088 Joined
+2017-08-03- 18:32:49: [D] : Joined: 60 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038086256384 Joined
+2017-08-03- 18:32:49: [D] : Joined: 61 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038077863680 Joined
+2017-08-03- 18:32:49: [D] : Joined: 62 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038069470976 Joined
+2017-08-03- 18:32:49: [D] : Joined: 63 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038061078272 Joined
+2017-08-03- 18:32:49: [D] : Joined: 64 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038052685568 Joined
+2017-08-03- 18:32:49: [D] : Joined: 65 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038044292864 Joined
+2017-08-03- 18:32:49: [D] : Joined: 66 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038035900160 Joined
+2017-08-03- 18:32:49: [D] : Joined: 67 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038027507456 Joined
+2017-08-03- 18:32:49: [D] : Joined: 68 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038019114752 Joined
+2017-08-03- 18:32:49: [D] : Joined: 69 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038010722048 Joined
+2017-08-03- 18:32:49: [D] : Joined: 70 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140038002329344 Joined
+2017-08-03- 18:32:49: [D] : Joined: 71 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037993936640 Joined
+2017-08-03- 18:32:49: [D] : Joined: 72 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037985543936 Joined
+2017-08-03- 18:32:49: [D] : Joined: 73 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037977151232 Joined
+2017-08-03- 18:32:49: [D] : Joined: 74 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037968758528 Joined
+2017-08-03- 18:32:49: [D] : Joined: 75 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037960365824 Joined
+2017-08-03- 18:32:49: [D] : Joined: 76 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037951973120 Joined
+2017-08-03- 18:32:49: [D] : Joined: 77 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037943580416 Joined
+2017-08-03- 18:32:49: [D] : Joined: 78 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037935187712 Joined
+2017-08-03- 18:32:49: [D] : Joined: 79 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037926795008 Joined
+2017-08-03- 18:32:49: [D] : Joined: 80 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037918402304 Joined
+2017-08-03- 18:32:49: [D] : Joined: 81 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037910009600 Joined
+2017-08-03- 18:32:49: [D] : Joined: 82 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037901616896 Joined
+2017-08-03- 18:32:49: [D] : Joined: 83 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037893224192 Joined
+2017-08-03- 18:32:49: [D] : Joined: 84 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037884831488 Joined
+2017-08-03- 18:32:49: [D] : Joined: 85 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037876438784 Joined
+2017-08-03- 18:32:49: [D] : Joined: 86 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037868046080 Joined
+2017-08-03- 18:32:49: [D] : Joined: 87 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037859653376 Joined
+2017-08-03- 18:32:49: [D] : Joined: 88 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037851260672 Joined
+2017-08-03- 18:32:49: [D] : Joined: 89 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037842867968 Joined
+2017-08-03- 18:32:49: [D] : Joined: 90 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037834475264 Joined
+2017-08-03- 18:32:49: [D] : Joined: 91 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037826082560 Joined
+2017-08-03- 18:32:49: [D] : Joined: 92 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037817689856 Joined
+2017-08-03- 18:32:49: [D] : Joined: 93 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037809297152 Joined
+2017-08-03- 18:32:49: [D] : Joined: 94 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037800904448 Joined
+2017-08-03- 18:32:49: [D] : Joined: 95 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037792511744 Joined
+2017-08-03- 18:32:49: [D] : Joined: 96 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037784119040 Joined
+2017-08-03- 18:32:49: [D] : Joined: 97 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037775726336 Joined
+2017-08-03- 18:32:49: [D] : Joined: 98 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037767333632 Joined
+2017-08-03- 18:32:49: [D] : Joined: 99 Thread  out of: 100
+2017-08-03- 18:32:49: [D] : Thread Number: 140037758940928 Joined
+2017-08-03- 18:32:49: [D] : Joined: 100 Thread  out of: 100
+2017-08-03- 18:32:52: [D] : All Write Threads Joined
+2017-08-03- 18:32:52: [I] : ===========================================================================================================================
+2017-08-03- 18:32:52: [D] : Destroying Read Mutexes and Cond. Variables
+2017-08-03- 18:32:52: [D] : All Read Mutexes Destroyed
+2017-08-03- 18:32:52: [I] : ===========================================================================================================================
+2017-08-03- 18:32:52: [D] : Destroying Write Mutexes and Cond. Variables
+2017-08-03- 18:32:52: [D] : All Write Mutexes Destroyed
+2017-08-03- 18:32:52: [I] : ===========================================================================================================================
+2017-08-03- 18:32:52: [I] : Closing File descriptors
+2017-08-03- 18:32:52: [I] : Deleting Events
+2017-08-03- 18:32:52: [I] : Deleting Threads Array
+2017-08-03- 18:32:52: [I] : Deleting Mutex Array
+2017-08-03- 18:32:52: [I] : Deleting Conditional Variables Array
+2017-08-03- 18:32:52: [I] : Deleting Threads Array
+2017-08-03- 18:32:52: [I] : ===========================================================================================================================
+2017-08-03- 18:32:52: [I] : Destruction Completed
+2017-08-03- 18:32:52: [I] : ===========================================================================================================================
+2017-08-03- 18:32:52: [I] : Success Termination of EPOll Server

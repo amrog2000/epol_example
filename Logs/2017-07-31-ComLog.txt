@@ -1,0 +1,72 @@
+2017-07-31- 17:41:54: [I] : ===========================================================================================================================
+2017-07-31- 17:41:54: [I] : Starting EPOll Server
+2017-07-31- 17:41:54: [I] : ===========================================================================================================================
+2017-07-31- 17:41:54: [I] : Inserted: 10 User Records
+2017-07-31- 17:42:05: [E] : Entering epoll loop waiting for connections
+2017-07-31- 17:43:08: [I] : ===========================================================================================================================
+2017-07-31- 17:43:08: [I] : Starting EPOll Server
+2017-07-31- 17:43:08: [I] : ===========================================================================================================================
+2017-07-31- 17:43:08: [I] : Inserted: 10 User Records
+2017-07-31- 17:43:10: [E] : Entering epoll loop waiting for connections
+2017-07-31- 17:43:31: [I] : Exited from epoll loop 
+2017-07-31- 17:43:31: [I] : Terminating Threads
+2017-07-31- 17:43:36: [D] : Terminating Read Threads
+2017-07-31- 17:43:42: [D] : Terminating Write Threads
+2017-07-31- 17:43:57: [D] : Thread Number: 140199772190464 Joined
+2017-07-31- 17:43:57: [D] : Joined: 0 Thread  out of: 11
+2017-07-31- 17:43:58: [D] : Thread Number: 140199763797760 Joined
+2017-07-31- 17:43:58: [D] : Joined: 1 Thread  out of: 11
+2017-07-31- 17:43:58: [D] : Thread Number: 140199755405056 Joined
+2017-07-31- 17:43:58: [D] : Joined: 2 Thread  out of: 11
+2017-07-31- 17:43:59: [D] : Thread Number: 140199747012352 Joined
+2017-07-31- 17:43:59: [D] : Joined: 3 Thread  out of: 11
+2017-07-31- 17:44:07: [D] : Thread Number: 140199738619648 Joined
+2017-07-31- 17:44:07: [D] : Joined: 4 Thread  out of: 11
+2017-07-31- 17:44:08: [D] : Thread Number: 140199730226944 Joined
+2017-07-31- 17:44:08: [D] : Joined: 5 Thread  out of: 11
+2017-07-31- 17:44:08: [D] : Thread Number: 140199721834240 Joined
+2017-07-31- 17:44:08: [D] : Joined: 6 Thread  out of: 11
+2017-07-31- 17:44:08: [D] : Thread Number: 140199713441536 Joined
+2017-07-31- 17:44:08: [D] : Joined: 7 Thread  out of: 11
+2017-07-31- 17:44:08: [D] : Thread Number: 140199705048832 Joined
+2017-07-31- 17:44:08: [D] : Joined: 8 Thread  out of: 11
+2017-07-31- 17:44:09: [D] : Thread Number: 140199696656128 Joined
+2017-07-31- 17:44:09: [D] : Joined: 9 Thread  out of: 11
+2017-07-31- 17:44:09: [D] : Thread Number: 140199688263424 Joined
+2017-07-31- 17:44:09: [D] : Joined: 10 Thread  out of: 11
+2017-07-31- 17:44:15: [D] : All Read Threads Joined
+2017-07-31- 17:44:24: [D] : Thread Number: 140199679870720 Joined
+2017-07-31- 17:44:24: [D] : Joined: 0 Thread  out of: 11
+2017-07-31- 17:44:26: [D] : Thread Number: 140199671478016 Joined
+2017-07-31- 17:44:26: [D] : Joined: 1 Thread  out of: 11
+2017-07-31- 17:44:26: [D] : Thread Number: 140199663085312 Joined
+2017-07-31- 17:44:26: [D] : Joined: 2 Thread  out of: 11
+2017-07-31- 17:44:26: [D] : Thread Number: 140199654692608 Joined
+2017-07-31- 17:44:26: [D] : Joined: 3 Thread  out of: 11
+2017-07-31- 17:44:27: [D] : Thread Number: 140199646299904 Joined
+2017-07-31- 17:44:27: [D] : Joined: 4 Thread  out of: 11
+2017-07-31- 17:44:27: [D] : Thread Number: 140199637907200 Joined
+2017-07-31- 17:44:27: [D] : Joined: 5 Thread  out of: 11
+2017-07-31- 17:44:27: [D] : Thread Number: 140199629514496 Joined
+2017-07-31- 17:44:27: [D] : Joined: 6 Thread  out of: 11
+2017-07-31- 17:44:27: [D] : Thread Number: 140199621121792 Joined
+2017-07-31- 17:44:27: [D] : Joined: 7 Thread  out of: 11
+2017-07-31- 17:44:28: [D] : Thread Number: 140199612729088 Joined
+2017-07-31- 17:44:28: [D] : Joined: 8 Thread  out of: 11
+2017-07-31- 17:44:28: [D] : Thread Number: 140199604336384 Joined
+2017-07-31- 17:44:28: [D] : Joined: 9 Thread  out of: 11
+2017-07-31- 17:44:28: [D] : Thread Number: 140199595943680 Joined
+2017-07-31- 17:44:28: [D] : Joined: 10 Thread  out of: 11
+2017-07-31- 17:44:32: [D] : All Write Threads Joined
+2017-07-31- 17:44:32: [D] : Destroying Read Mutexes and Cond. Variables
+2017-07-31- 17:44:42: [D] : All Read Mutexes Destroyed
+2017-07-31- 17:44:42: [D] : Destroying Write Mutexes and Cond. Variables
+2017-07-31- 17:44:49: [D] : All Write Mutexes Destroyed
+2017-07-31- 17:44:52: [I] : Closing File descriptors
+2017-07-31- 17:44:53: [I] : Deleting Events
+2017-07-31- 17:44:54: [I] : Deleting Threads Array
+2017-07-31- 17:44:57: [I] : Deleting Mutex Array
+2017-07-31- 17:44:59: [I] : Deleting Conditional Variables Array
+2017-07-31- 17:45:05: [I] : Deleting Threads Array
+2017-07-31- 17:45:12: [I] : Destruction Completed
+2017-07-31- 17:45:12: [I] : Success Termination of EPOll Server
