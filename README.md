@@ -1,4 +1,4 @@
-Quanticks Market Data Infrastructure Server
+ 
 ===========================================
 
 
